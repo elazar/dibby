@@ -1,0 +1,31 @@
+{
+    "name": "elazar/dibby",
+    "description": "A personal finance manager",
+    "type": "project",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Elazar\\Dibby\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Matthew Turland",
+            "email": "me@matthewturland.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": "^8.0",
+        "doctrine/dbal": "^3.1",
+        "doctrine/migrations": "^3.3",
+        "league/route": "^5.1",
+        "pimple/pimple": "^3.5"
+    },
+    "require-dev": {
+        "maximebf/debugbar": "^1.17"
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
