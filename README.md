@@ -4,17 +4,14 @@ A personal finance manager.
 
 ## Installation
 
+First, run these from the root of this repository.
+
 ```bash
 # Install dependencies
 docker-compose run --rm composer install
 
-# Apply configuration
-cp .env.dist .env
-# Modify .env as needed
-
-# Run database migrations
-docker-compose run --rm --entrypoint php ./vendor/bin/doctrine-migrations migrate
-
 # Start containers
 docker-compose up -d
 ```
+
+Then, navigate to [http://localhost:8080](http://localhost:8080) to continue.

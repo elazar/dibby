@@ -20,13 +20,16 @@
         "doctrine/dbal": "^3.1",
         "doctrine/migrations": "^3.3",
         "laminas/laminas-httphandlerrunner": "^2.1",
+        "league/flysystem": "^2.3",
+        "league/plates": "^3.4",
         "league/route": "^5.1",
+        "m1/env": "^2.2",
+        "monolog/monolog": "^2.3",
         "nyholm/psr7": "^1.4",
         "nyholm/psr7-server": "^1.0",
-        "pimple/pimple": "^3.5"
-    },
-    "require-dev": {
-        "maximebf/debugbar": "^1.17"
+        "pimple/pimple": "^3.5",
+        "psr7-sessions/storageless": "^8.4",
+        "symfony/cache": "^5.3"
     },
     "config": {
         "sort-packages": true
