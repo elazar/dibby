@@ -3,6 +3,7 @@
 namespace Elazar\Dibby;
 
 use Laminas\HttpHandlerRunner\Emitter\EmitterInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
@@ -16,7 +17,7 @@ class Application
 
     public function run(): void
     {
-        $response = $this->handler->dispatch($this->request);
+        $response = $this->handler->handle($this->request);
         $this->emitter->emit($response);
     }
 }

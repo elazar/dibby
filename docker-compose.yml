@@ -16,10 +16,8 @@ services:
     build: docker/php
     working_dir: /app
     volumes:
-      - .:/app:ro
+      - .:/app
     entrypoint: /usr/local/sbin/php-fpm -F
-    depends_on:
-      - pgsql
 
   composer:
     image: composer:latest
@@ -29,6 +27,10 @@ services:
 
   pgsql:
     image: postgres:14-alpine
+    environment:
+      POSTGRES_PASSWORD: dibby
+      POSTGRES_USER: dibby
+      POSTGRES_DB: dibby
     volumes:
       - "pgsql:/var/lib/postgresql/data"
 

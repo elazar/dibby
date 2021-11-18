@@ -19,17 +19,25 @@
         "php": "^8.0",
         "doctrine/dbal": "^3.1",
         "doctrine/migrations": "^3.3",
+        "firebase/php-jwt": "^5.5",
         "laminas/laminas-httphandlerrunner": "^2.1",
-        "league/flysystem": "^2.3",
         "league/plates": "^3.4",
         "league/route": "^5.1",
-        "m1/env": "^2.2",
         "monolog/monolog": "^2.3",
         "nyholm/psr7": "^1.4",
         "nyholm/psr7-server": "^1.0",
         "pimple/pimple": "^3.5",
-        "psr7-sessions/storageless": "^8.4",
-        "symfony/cache": "^5.3"
+        "ramsey/uuid": "^4.2",
+        "symfony/cache": "^5.3",
+        "symfony/console": "^5.3"
+    },
+    "require-dev": {
+        "pestphp/pest": "^1.20",
+        "phpstan/phpstan": "^1.2"
+    },
+    "scripts": {
+        "lint": "phpstan analyse --level=9 src",
+        "test": "pest"
     },
     "config": {
         "sort-packages": true

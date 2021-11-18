@@ -1,0 +1,99 @@
+<?php
+
+namespace Elazar\Dibby\Database;
+
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Logging\SQLLogger;
+use Elazar\Dibby\Configuration\Configuration;
+use Elazar\Dibby\Exception;
+use Throwable;
+
+class DoctrineConnectionFactory implements DatabaseConnectionFactory
+{
+    private ?Connection $readConnection;
+    private ?Connection $writeConnection;
+
+    public function __construct(
+        private DatabaseConfiguration $readConfiguration,
+        private DatabaseConfiguration $writeConfiguration,
+        private SQLLogger $sqlLogger,
+    ) { }
+
+    /**
+     * @return string[]
+     */
+    public function getAvailableDrivers(): array
+    {
+        $drivers = array_filter(
+            DriverManager::getAvailableDrivers(),
+            'extension_loaded',
+        );
+        sort($drivers);
+        return $drivers;
+    }
+
+    /**
+     * @throws \Elazar\Dibby\Exception
+     * @return Connection
+     */
+    public function getReadConnection()
+    {
+        if ($this->readConnection === null) {
+            $this->readConnection = $this->getConnection($this->readConfiguration);
+        }
+        return $this->readConnection;
+    }
+
+    /**
+     * @throws \Elazar\Dibby\Exception
+     * @return Connection
+     */
+    public function getWriteConnection()
+    {
+        if ($this->writeConnection === null) {
+            $this->writeConnection = $this->getConnection($this->writeConfiguration);
+
+            // Switch subsequent reads to the write connection to avoid
+            // fetching stale data due to delays in replication
+            $this->readConnection = $this->writeConnection;
+        }
+        return $this->writeConnection;
+    }
+
+    private function getConnection(DatabaseConfiguration $configuration): Connection
+    {
+        if ($configuration->getDriver() === 'pdo_sqlite'
+            && empty($configuration->getHost())) {
+            throw Exception::databaseMissingSqlitePath();
+        }
+
+        $params = [
+            'dbname' => $configuration->getName(),
+            'user' => $configuration->getUser(),
+            'password' => $configuration->getPassword(),
+            'host' => $configuration->getHost(),
+            'driver' => $configuration->getDriver(),
+            'port' => $configuration->getPort(),
+        ];
+
+        try {
+            $connection = DriverManager::getConnection($params);
+            $connection->getConfiguration()->setSQLLogger($this->sqlLogger);
+            $connection->connect();
+            return $connection;
+        } catch (Throwable $error) {
+            $message = $error->getMessage();
+            if (strpos($message, "'driver' or 'driverClass' are mandatory") !== false) {
+                throw Exception::databaseMissingDriver($error);
+            }
+            if (strpos($message, 'could not connect to server') !== false) {
+                throw Exception::databaseConnectionFailed($error);
+            }
+            if (strpos($message, 'Doctrine currently supports only the following drivers') !== false) {
+                throw Exception::databaseDriverUnavailable($configuration->getDriver(), $error);
+            }
+            throw Exception::databaseUnknownError($error);
+        }
+    }
+}

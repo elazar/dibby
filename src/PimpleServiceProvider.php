@@ -2,15 +2,22 @@
 
 namespace Elazar\Dibby;
 
+use DateTimeImmutable;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Logging\DebugStack;
 use Doctrine\DBAL\Logging\SQLLogger;
-use Elazar\Dibby\Controller\ConfigureController;
-use Elazar\Dibby\Controller\IndexController;
-/* use Elazar\Dibby\Controller\InstallController; */
+use Elazar\Dibby\Configuration\Configuration;
+use Elazar\Dibby\Configuration\ConfigurationFactory;
+use Elazar\Dibby\Configuration\EnvConfigurationFactory;
+use Elazar\Dibby\Database\DatabaseConnectionFactory;
+use Elazar\Dibby\Database\DoctrineConnectionFactory;
+use Elazar\Dibby\Jwt\JwtMiddleware;
+use Elazar\Dibby\Jwt\JwtRequestTransformer;
+use Elazar\Dibby\Jwt\UserJwtRequestTransformer;
+use Elazar\Dibby\User\DoctrineUserRepository;
+use Elazar\Dibby\User\UserRepositoryInterface;
 use Laminas\HttpHandlerRunner\Emitter\EmitterInterface;
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
-use Lcobucci\JWT\Signer\Key\InMemory as Key;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemOperator;
 use League\Flysystem\Local\LocalFilesystemAdapter;
@@ -18,7 +25,6 @@ use League\Plates\Engine as PlatesEngine;
 use League\Route\Router;
 use League\Route\Strategy\ApplicationStrategy;
 use League\Route\Strategy\StrategyInterface;
-use M1\Env\Parser as EnvParser;
 use Monolog\Formatter\NormalizerFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
@@ -36,35 +42,14 @@ use Psr\Http\Message\UploadedFileFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
-use Psr\SimpleCache\CacheInterface;
-use PSR7Sessions\Storageless\Http\SessionMiddleware;
-use Symfony\Component\Cache\Adapter\ApcuAdapter;
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
-use Symfony\Component\Cache\Psr16Cache;
 
 class PimpleServiceProvider implements ServiceProviderInterface
 {
+    /**
+     * @return void
+     */
     public function register(Container $pimple)
     {
-        // PSR-16 cache implementations
-        $pimple['cache.apcu'] = fn($c): CacheInterface => new Psr16Cache(
-            extension_loaded('apcu') ? new ApcuAdapter : new ArrayAdapter,
-        );
-
-        // Filesystem abstraction
-        $pimple['filesystem.local'] = fn($c) => new Filesystem(
-            new LocalFilesystemAdapter(__DIR__ . '/..'),
-        );
-
-        // Environmental variables
-        $pimple[EnvFactory::class] = fn($c) => new EnvFactory(
-            $pimple['cache.apcu'],
-            'env',
-            $pimple['filesystem.local'],
-            '.env',
-        );
-        $pimple['env'] = fn($c): array => $c[EnvFactory::class]->get();
-
         // PSR-7 implementation
         $pimple[Psr17Factory::class] = fn() => new Psr17Factory;
         $pimple[ResponseFactoryInterface::class] = fn($c) => $c[Psr17Factory::class];
@@ -83,25 +68,28 @@ class PimpleServiceProvider implements ServiceProviderInterface
         $pimple[ServerRequestCreatorInterface::class] = fn($c) => $c[ServerRequestCreator::class];
         $pimple[ServerRequestInterface::class] = fn($c) => $c[ServerRequestCreatorInterface::class]->fromGlobals();
 
+        // PSR-15 middleware implementations
+        $pimple[DateTimeImmutable::class] = new DateTimeImmutable;
+        $pimple[JwtRequestTransformer::class] = fn($c) => $c[UserJwtRequestTransformer::class];
+        $pimple[JwtMiddleware::class] = fn($c) => new JwtMiddleware(
+            $c[LoggerInterface::class],
+            $c[JwtRequestTransformer::class],
+            $c[DateTimeImmutable::class],
+            $c[Configuration::class]->getSessionKey(),
+            $c[Configuration::class]->getSessionTimeToLive(),
+        );
+
         // PSR-15 request handler implementation
         $pimple[ApplicationStrategy::class] = fn($c) => (new ApplicationStrategy)
             ->setContainer(new PsrContainer($c));
         $pimple[StrategyInterface::class] = fn($c) => $c[ApplicationStrategy::class];
         $pimple[Router::class] = function ($c) {
-            $router = (new Router)->setStrategy($c[StrategyInterface::class]);
-            if (isset($c['env']['SESSION_KEY'])) {
-                $router->middleware($c[SessionMiddleware::class]);
-            }
+            $router = new Router;
+            $router->setStrategy($c[StrategyInterface::class]);
+            $router->middleware($c[JwtMiddleware::class]);
             return $this->withRoutes($router);
         };
         $pimple[RequestHandlerInterface::class] = fn($c) => $c[Router::class];
-
-        // PSR-15 session middleware
-        $pimple[SessionMiddleware::class] = fn($c) => SessionMiddleware::fromSymmetricKeyDefaults(
-            Key::base64Encoded($c['env']['SESSION_KEY']),
-            $c['env']['SESSION_TTL'],
-        );
-        $pimple[Session::class] = fn($c) => new Session($c[ServerRequestInterface::class]);
 
         // Response emitter
         $pimple[EmitterInterface::class] = fn($c) => $c[SapiEmitter::class];
@@ -118,7 +106,14 @@ class PimpleServiceProvider implements ServiceProviderInterface
         );
 
         // Template engine
-        $pimple[PlatesEngine::class] = fn($c) => new PlatesEngine(__DIR__ . '/../templates');
+        $pimple[PlatesRouteExtension::class] = fn($c) => new PlatesRouteExtension(
+            $c[RoutePathMap::class],
+        );
+        $pimple[PlatesEngine::class] = function ($c) {
+            $engine = new PlatesEngine(__DIR__ . '/../templates');
+            $engine->loadExtension($c[PlatesRouteExtension::class]);
+            return $engine;
+        };
 
         // Logger
         $pimple[Logger::class] = function ($c) {
@@ -130,44 +125,41 @@ class PimpleServiceProvider implements ServiceProviderInterface
         };
         $pimple[LoggerInterface::class] = fn($c) => $c[Logger::class];
 
-        // Database
-        $pimple[DatabaseConnectionFactory::class] = fn($c) => new DatabaseConnectionFactory($c['env']);
+        // Configuration
+        $pimple[EnvConfigurationFactory::class] = new EnvConfigurationFactory;
+        $pimple[ConfigurationFactory::class] = $pimple[EnvConfigurationFactory::class];
+        $pimple[Configuration::class] = fn($c) => $c[ConfigurationFactory::class]->getConfiguration();
+
+        // Doctrine
         $pimple[DebugStack::class] = fn($c) => new DebugStack;
         $pimple[SQLLogger::class] = fn($c) => $c[DebugStack::class];
-        $pimple[Connection::class] = function ($c) {
-            $connection = $c[DatabaseConnectionFactory::class]->getConnection();
-            $connection->getConfiguration()->setSQLLogger($c[SQLLogger::class]);
-            return $connection;
-        };
+        $pimple[DoctrineConnectionFactory::class] = fn($c) => new DoctrineConnectionFactory(
+            $c[Configuration::class]->getDatabaseReadConfiguration(),
+            $c[Configuration::class]->getDatabaseWriteConfiguration(),
+            $c[SQLLogger::class],
+        );
+        $pimple[DatabaseConnectionFactory::class] = fn($c) => $c[DoctrineConnectionFactory::class];
+
+        // Users
+        $pimple[DoctrineUserRepository::class] = fn($c) => new DoctrineUserRepository(
+            $c[DoctrineConnectionFactory::class],
+        );
+        $pimple[UserRepositoryInterface::class] = fn($c) => $c[DoctrineUserRepository::class];
 
         // Controllers
-        $pimple[IndexController::class] = fn($c) => new IndexController(
+        $pimple[GetIndexController::class] = fn($c) => new GetIndexController(
             $c[ResponseFactoryInterface::class],
-            $c['env'],
-            $c[Session::class],
-            $c[RoutePathMap::class]->getPath('configure'),
-            $c[RoutePathMap::class]->getPath('login'),
-            $c[RoutePathMap::class]->getPath('dashboard'),
+            $c[RoutePathMap::class],
         );
-        $pimple[ConfigureController::class] = fn($c) => new ConfigureController(
-            $c[ResponseFactoryInterface::class],
-            $c[PlatesEngine::class],
-            $c[RoutePathMap::class]->getPath('install'),
-        );
-        /* $pimple[InstallController::class] = fn($c) => new InstallController( */
-        /*     $c[PlatesEngine::class], */
-        /* ); */
     }
 
     private function withRoutes(Router $router): Router
     {
         $routes = [
-            ['GET', '/', IndexController::class, 'index'],
-            ['GET', '/install', ConfigureController::class, 'configure'],
-            ['POST', '/install', InstallController::class, 'install'],
-            ['GET', '/login', LoginController::class, 'login'],
-            ['POST', '/login', AuthenticateController::class, 'authenticate'],
-            ['GET', '/dashboard', DashboardController::class, 'dashboard'],
+            /* ['GET', '/', GetIndexController::class, 'get_index'], */
+            /* ['GET', '/login', GetLoginController::class, 'get_login'], */
+            /* ['POST', '/login', PostLoginController::class, 'post_login'], */
+            /* ['GET', '/dashboard', GetDashboardController::class, 'get_dashboard'], */
         ];
 
         foreach ($routes as $route) {
