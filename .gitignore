@@ -1,3 +1,5 @@
 .env
 .phpunit.result.cache
+config.env
+config.php
 vendor

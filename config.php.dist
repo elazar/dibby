@@ -1,0 +1,32 @@
+<?php
+
+return [
+
+    'db' => [
+
+        'read' => [
+            'driver' => 'pdo_pgsql',
+            'host' => 'pgsql',
+            'port' => 5432,
+            'user' => 'dibby',
+            'password' => 'dibby',
+            'name' => 'dibby',
+        ],
+
+        'write' => [
+            'driver' => 'pdo_pgsql',
+            'host' => 'pgsql',
+            'port' => 5432,
+            'user' => 'dibby',
+            'password' => 'dibby',
+            'name' => 'dibby',
+        ],
+
+    ],
+
+    'session' => [
+        'key' => 'ChangeMe',
+        'ttl' => 1800,
+    ],
+
+];

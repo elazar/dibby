@@ -1,14 +1,15 @@
 <?php
 
-namespace Elazar\Dibby;
+namespace Elazar\Dibby\Template;
 
+use Elazar\Dibby\RouteConfiguration;
 use League\Plates\Engine;
 use League\Plates\Extension\ExtensionInterface;
 
 class PlatesRouteExtension implements ExtensionInterface
 {
     public function __construct(
-        private RoutePathMap $routePathMap,
+        private RouteConfiguration $routes,
     ) { }
 
     /**
@@ -30,7 +31,7 @@ class PlatesRouteExtension implements ExtensionInterface
         $engine->registerFunction(
             'route',
             /** @phpstan-ignore-next-line */
-            fn(string $name): string => $this->routePathMap->getPath($name),
+            fn(string $name): string => $this->routes->getPath($name),
         );
     }
 }

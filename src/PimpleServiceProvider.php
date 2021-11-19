@@ -3,44 +3,95 @@
 namespace Elazar\Dibby;
 
 use DateTimeImmutable;
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Logging\DebugStack;
-use Doctrine\DBAL\Logging\SQLLogger;
-use Elazar\Dibby\Configuration\Configuration;
-use Elazar\Dibby\Configuration\ConfigurationFactory;
-use Elazar\Dibby\Configuration\EnvConfigurationFactory;
-use Elazar\Dibby\Database\DatabaseConnectionFactory;
-use Elazar\Dibby\Database\DoctrineConnectionFactory;
-use Elazar\Dibby\Jwt\JwtMiddleware;
-use Elazar\Dibby\Jwt\JwtRequestTransformer;
-use Elazar\Dibby\Jwt\UserJwtRequestTransformer;
-use Elazar\Dibby\User\DoctrineUserRepository;
-use Elazar\Dibby\User\UserRepositoryInterface;
-use Laminas\HttpHandlerRunner\Emitter\EmitterInterface;
-use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
-use League\Flysystem\Filesystem;
-use League\Flysystem\FilesystemOperator;
-use League\Flysystem\Local\LocalFilesystemAdapter;
+
+use Doctrine\DBAL\{
+    Connection,
+    Logging\DebugStack,
+    Logging\SQLLogger,
+};
+
+use Elazar\Dibby\Configuration\{
+    Configuration,
+    ConfigurationFactory,
+    EnvConfigurationFactory,
+    PhpConfigurationFactory,
+};
+
+use Elazar\Dibby\Controller\{
+    GetIndexController,
+};
+
+use Elazar\Dibby\Database\{
+    DatabaseConnectionFactory,
+    DoctrineConnectionFactory,
+};
+
+use Elazar\Dibby\Jwt\{
+    JwtMiddleware,
+    JwtRequestTransformer,
+    UserJwtRequestTransformer,
+};
+
+use Elazar\Dibby\Template\{
+    PlatesRouteExtension,
+    PlatesTemplateEngine,
+    TemplateEngine,
+};
+
+use Elazar\Dibby\User\{
+    DoctrineUserRepository,
+    UserRepositoryInterface,
+};
+
+use Laminas\HttpHandlerRunner\Emitter\{
+    EmitterInterface,
+    SapiEmitter,
+};
+
+use League\Flysystem\{
+    Filesystem,
+    FilesystemOperator,
+    Local\LocalFilesystemAdapter,
+};
+
 use League\Plates\Engine as PlatesEngine;
-use League\Route\Router;
-use League\Route\Strategy\ApplicationStrategy;
-use League\Route\Strategy\StrategyInterface;
-use Monolog\Formatter\NormalizerFormatter;
-use Monolog\Handler\StreamHandler;
-use Monolog\Logger;
+
+use League\Route\{
+    Router,
+    Strategy\ApplicationStrategy,
+    Strategy\StrategyInterface,
+};
+
+use Monolog\{
+    Formatter\NormalizerFormatter,
+    Handler\StreamHandler,
+    Logger,
+};
+
 use Nyholm\Psr7\Factory\Psr17Factory;
-use Nyholm\Psr7Server\ServerRequestCreator;
-use Nyholm\Psr7Server\ServerRequestCreatorInterface;
-use Pimple\Container;
-use Pimple\Psr11\Container as PsrContainer;
-use Pimple\ServiceProviderInterface;
-use Psr\Http\Message\ResponseFactoryInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Message\ServerRequestFactoryInterface;
-use Psr\Http\Message\StreamFactoryInterface;
-use Psr\Http\Message\UploadedFileFactoryInterface;
-use Psr\Http\Message\UriFactoryInterface;
+
+use Nyholm\Psr7Server\{
+    ServerRequestCreator,
+    ServerRequestCreatorInterface,
+};
+
+use Pimple\{
+    Container,
+    Psr11\Container as PsrContainer,
+    ServiceProviderInterface,
+};
+
+use Psr\Http\Message\{
+    ResponseFactoryInterface,
+    ServerRequestInterface,
+    ServerRequestFactoryInterface,
+    StreamFactoryInterface,
+    UploadedFileFactoryInterface,
+    UriFactoryInterface,
+};
+
 use Psr\Http\Server\RequestHandlerInterface;
+
 use Psr\Log\LoggerInterface;
 
 class PimpleServiceProvider implements ServiceProviderInterface
@@ -87,7 +138,7 @@ class PimpleServiceProvider implements ServiceProviderInterface
             $router = new Router;
             $router->setStrategy($c[StrategyInterface::class]);
             $router->middleware($c[JwtMiddleware::class]);
-            return $this->withRoutes($router);
+            return $c[RouteConfiguration::class]->apply($router);
         };
         $pimple[RequestHandlerInterface::class] = fn($c) => $c[Router::class];
 
@@ -101,19 +152,21 @@ class PimpleServiceProvider implements ServiceProviderInterface
             $c[RequestHandlerInterface::class],
             $c[EmitterInterface::class],
         );
-        $pimple[RoutePathMap::class] = fn($c) => new RoutePathMap(
-            $c[Router::class],
-        );
+        $pimple[RouteConfiguration::class] = fn() => new RouteConfiguration;
 
         // Template engine
         $pimple[PlatesRouteExtension::class] = fn($c) => new PlatesRouteExtension(
-            $c[RoutePathMap::class],
+            $c[RouteConfiguration::class],
         );
         $pimple[PlatesEngine::class] = function ($c) {
             $engine = new PlatesEngine(__DIR__ . '/../templates');
             $engine->loadExtension($c[PlatesRouteExtension::class]);
             return $engine;
         };
+        $pimple[PlatesTemplateEngine::class] = fn($c) => new PlatesTemplateEngine(
+            $c[PlatesEngine::class],
+        );
+        $pimple[TemplateEngine::class] = fn($c) => $c[PlatesTemplateEngine::class];
 
         // Logger
         $pimple[Logger::class] = function ($c) {
@@ -127,7 +180,8 @@ class PimpleServiceProvider implements ServiceProviderInterface
 
         // Configuration
         $pimple[EnvConfigurationFactory::class] = new EnvConfigurationFactory;
-        $pimple[ConfigurationFactory::class] = $pimple[EnvConfigurationFactory::class];
+        $pimple[PhpConfigurationFactory::class] = new PhpConfigurationFactory;
+        $pimple[ConfigurationFactory::class] = $pimple[PhpConfigurationFactory::class];
         $pimple[Configuration::class] = fn($c) => $c[ConfigurationFactory::class]->getConfiguration();
 
         // Doctrine
@@ -149,24 +203,7 @@ class PimpleServiceProvider implements ServiceProviderInterface
         // Controllers
         $pimple[GetIndexController::class] = fn($c) => new GetIndexController(
             $c[ResponseFactoryInterface::class],
-            $c[RoutePathMap::class],
+            $c[RouteConfiguration::class],
         );
-    }
-
-    private function withRoutes(Router $router): Router
-    {
-        $routes = [
-            /* ['GET', '/', GetIndexController::class, 'get_index'], */
-            /* ['GET', '/login', GetLoginController::class, 'get_login'], */
-            /* ['POST', '/login', PostLoginController::class, 'post_login'], */
-            /* ['GET', '/dashboard', GetDashboardController::class, 'get_dashboard'], */
-        ];
-
-        foreach ($routes as $route) {
-            [$method, $path, $controller, $name] = $route;
-            $router->map($method, $path, $controller)->setName($name);
-        }
-
-        return $router;
     }
 }

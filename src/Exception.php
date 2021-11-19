@@ -13,6 +13,7 @@ class Exception extends \Exception
     public const CODE_DATABASE_UNKNOWN_ERROR       = 5;
     public const CODE_JWT_INVALID                  = 6;
     public const CODE_USER_NOT_FOUND               = 7;
+    public const CODE_ROUTE_NOT_FOUND              = 8;
 
     public static function databaseMissingSqlitePath(): self
     {
@@ -71,6 +72,14 @@ class Exception extends \Exception
         return new self(
             'User not found: ' . $userIdOrEmail,
             self::CODE_USER_NOT_FOUND,
+        );
+    }
+
+    public static function routeNotFound(string $name): self
+    {
+        return new self(
+            'Route not found: ' . $name,
+            self::CODE_ROUTE_NOT_FOUND,
         );
     }
 }

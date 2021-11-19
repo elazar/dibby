@@ -28,8 +28,7 @@
         "nyholm/psr7-server": "^1.0",
         "pimple/pimple": "^3.5",
         "ramsey/uuid": "^4.2",
-        "symfony/cache": "^5.3",
-        "symfony/console": "^5.3"
+        "symfony/cache": "^5.3"
     },
     "require-dev": {
         "pestphp/pest": "^1.20",
@@ -37,6 +36,7 @@
     },
     "scripts": {
         "lint": "phpstan analyse --level=9 src",
+        "migrate": "doctrine-migrations migrate",
         "test": "pest"
     },
     "config": {
