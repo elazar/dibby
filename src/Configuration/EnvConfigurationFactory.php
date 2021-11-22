@@ -30,7 +30,9 @@ class EnvConfigurationFactory implements ConfigurationFactory
             $databaseReadConfiguration,
             $databaseWriteConfiguration,
             $this->getEnv('SESSION_KEY'),
-            (int) $this->getEnv('SESSION_TTL'),
+            $this->getEnv('SESSION_COOKIE') ?: 'token',
+            $this->getEnv('SESSION_TTL') ?: 'P30M',
+            $this->getEnv('RESET_TOKEN_TTL') ?: 'P30M',
         );
     }
 

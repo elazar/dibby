@@ -19,12 +19,6 @@ services:
       - .:/app
     entrypoint: /usr/local/sbin/php-fpm -F
 
-  composer:
-    image: composer:latest
-    working_dir: /app
-    volumes:
-      - .:/app
-
   pgsql:
     image: postgres:14-alpine
     environment:

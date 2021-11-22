@@ -3,14 +3,14 @@
 namespace Elazar\Dibby\Jwt;
 
 use Elazar\Dibby\Exception;
-use Elazar\Dibby\User\UserRepositoryInterface;
+use Elazar\Dibby\User\UserRepository;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 
 class UserJwtRequestTransformer implements JwtRequestTransformer
 {
     public function __construct(
-        private UserRepositoryInterface $userRepository,
+        private UserRepository $userRepository,
         private LoggerInterface $logger,
     ) { }
 
@@ -18,18 +18,18 @@ class UserJwtRequestTransformer implements JwtRequestTransformer
         ServerRequestInterface $request,
         object $jwt,
     ): ServerRequestInterface {
-        if (!isset($jwt->user)) {
-            $this->logger->debug('JWT token missing user', [
+        if (!isset($jwt->sub)) {
+            $this->logger->warning('JWT token missing user', [
                 'jwt' => $jwt,
             ]);
             return $request;
         }
 
         try {
-            $user = $this->userRepository->getUserById($jwt->user);
+            $user = $this->userRepository->getUserById($jwt->sub);
         } catch (Exception $error) {
-            $this->logger->debug('Error retrieving JWT user', [
-                'user' => $jwt->user,
+            $this->logger->warning('Error retrieving JWT user', [
+                'user' => $jwt->sub,
                 'error' => $error,
             ]);
             return $request;

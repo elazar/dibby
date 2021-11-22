@@ -14,6 +14,7 @@ class Exception extends \Exception
     public const CODE_JWT_INVALID                  = 6;
     public const CODE_USER_NOT_FOUND               = 7;
     public const CODE_ROUTE_NOT_FOUND              = 8;
+    public const CODE_INVALID_INPUT                = 9;
 
     public static function databaseMissingSqlitePath(): self
     {
@@ -80,6 +81,14 @@ class Exception extends \Exception
         return new self(
             'Route not found: ' . $name,
             self::CODE_ROUTE_NOT_FOUND,
+        );
+    }
+
+    public static function invalidInput(string $message): self
+    {
+        return new self(
+            $message,
+            self::CODE_INVALID_INPUT,
         );
     }
 }

@@ -10,7 +10,9 @@ class Configuration
         private DatabaseConfiguration $databaseReadConfiguration,
         private DatabaseConfiguration $databaseWriteConfiguration,
         private string $sessionKey,
-        private int $sessionTimeToLive,
+        private string $sessionCookie,
+        private string $sessionTimeToLive,
+        private string $resetTokenTimeToLive,
     ) { }
 
     public function getDatabaseReadConfiguration(): DatabaseConfiguration
@@ -28,8 +30,18 @@ class Configuration
         return $this->sessionKey;
     }
 
-    public function getSessionTimeToLive(): int
+    public function getSessionCookie(): string
+    {
+        return $this->sessionCookie;
+    }
+
+    public function getSessionTimeToLive(): string
     {
         return $this->sessionTimeToLive;
+    }
+
+    public function getResetTokenTimeToLive(): string
+    {
+        return $this->resetTokenTimeToLive;
     }
 }

@@ -26,7 +26,12 @@ return [
 
     'session' => [
         'key' => 'ChangeMe',
-        'ttl' => 1800,
+        'cookie' => 'token',
+        'ttl' => 'PT30M',
+    ],
+
+    'reset_token' => [
+        'ttl' => 'PT30M',
     ],
 
 ];

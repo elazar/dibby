@@ -11,27 +11,14 @@ use Throwable;
 
 class DoctrineConnectionFactory implements DatabaseConnectionFactory
 {
-    private ?Connection $readConnection;
-    private ?Connection $writeConnection;
+    private ?Connection $readConnection = null;
+    private ?Connection $writeConnection = null;
 
     public function __construct(
         private DatabaseConfiguration $readConfiguration,
         private DatabaseConfiguration $writeConfiguration,
         private SQLLogger $sqlLogger,
     ) { }
-
-    /**
-     * @return string[]
-     */
-    public function getAvailableDrivers(): array
-    {
-        $drivers = array_filter(
-            DriverManager::getAvailableDrivers(),
-            'extension_loaded',
-        );
-        sort($drivers);
-        return $drivers;
-    }
 
     /**
      * @throws \Elazar\Dibby\Exception

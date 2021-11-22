@@ -8,6 +8,11 @@
             "Elazar\\Dibby\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Elazar\\Dibby\\": "tests/"
+        }
+    },
     "authors": [
         {
             "name": "Matthew Turland",
@@ -35,8 +40,9 @@
         "phpstan/phpstan": "^1.2"
     },
     "scripts": {
-        "lint": "phpstan analyse --level=9 src",
-        "migrate": "doctrine-migrations migrate",
+        "lint": "phpstan analyse -c phpstan.neon",
+        "make:migration": "doctrine-migrations generate --configuration=migrations/config.php --db-configuration=migrations/cli-config.php",
+        "migrate": "doctrine-migrations migrate --configuration=migrations/config.php --db-configuration=migrations/cli-params.php",
         "test": "pest"
     },
     "config": {

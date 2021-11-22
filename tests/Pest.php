@@ -1,52 +1,286 @@
 <?php
 
-/*
-|--------------------------------------------------------------------------
-| Test Case
-|--------------------------------------------------------------------------
-|
-| The closure you provide to your test functions is always bound to a specific PHPUnit test
-| case class. By default, that class is "PHPUnit\Framework\TestCase". Of course, you may
-| need to change it using the "uses()" function to bind a different classes or traits.
-|
-*/
+namespace Elazar\Dibby;
 
-// uses(Tests\TestCase::class)->in('Feature');
+use Elazar\Dibby\{
+    Application,
+    Configuration\Configuration,
+    Database\DoctrineConnectionFactory,
+    Jwt\JwtAdapter,
+    LoggerMiddleware,
+    PimpleServiceProvider,
+    User\DefaultPasswordHasher,
+    User\User,
+    User\UserService,
+};
+use League\Route\Router;
+use Monolog\{
+    Handler\TestHandler,
+    Logger,
+};
+use Nyholm\Psr7Server\ServerRequestCreatorInterface;
+use Pimple\{
+    Container,
+    Psr11\Container as PsrContainer,
+};
+use Psr\Log\LoggerInterface;
+use Psr\Http\{
+    Message\ResponseInterface,
+    Message\ServerRequestInterface,
+};
 
-/*
-|--------------------------------------------------------------------------
-| Expectations
-|--------------------------------------------------------------------------
-|
-| When you're writing tests, you often need to check that values meet certain conditions. The
-| "expect()" function gives you access to a set of "expectations" methods that you can use
-| to assert different things. Of course, you may extend the Expectation API at any time.
-|
-*/
-
-/* expect()->extend('toBeOne', function () { */
-/*     return $this->toBe(1); */
-/* }); */
-
-/*
-|--------------------------------------------------------------------------
-| Functions
-|--------------------------------------------------------------------------
-|
-| While Pest is very powerful out-of-the-box, you may have some testing code specific to your
-| project that you don't want to repeat in every file. Here you can also expose helpers as
-| global functions to help you to reduce the number of lines of code in your test files.
-|
-*/
-
-function container(?string $key = null, array $overrides = [])
+/**
+ * @return array<string, string>
+ */
+function getResponseCookies(ResponseInterface $response): array
 {
-    $container = new \Pimple\Container;
-    $container->register(new \Elazar\Dibby\PimpleServiceProvider);
-    foreach ($overrides as $overrideKey => $overrideFn) {
-        $container[$overrideKey] = $overrideFn;
-    }
-    return $key === null
-        ? new \Pimple\Psr11\Container($container)
-        : $container[$key];
+    return array_reduce(
+        $response->getHeader('Set-Cookie'),
+        /**
+         * @param array<string, string> $cookies
+         * @return array<string, string>
+         */
+        function (array $cookies, string $header): array {
+            if (preg_match('/([^=]+)=([^\s;]+)/', $header, $match)) {
+                [, $name, $value] = $match;
+                $cookies[$name] = $value;
+            }
+            return $cookies;
+        },
+        [],
+    );
 }
+
+expect()->extend('toHaveStatusCode', function (int $statusCode) {
+    expect($this->value->getStatusCode())->toBe($statusCode);
+    return $this;
+});
+
+expect()->extend('toHaveHeader', function (string $header, string $value) {
+    expect($this->value->getHeaderLine($header))->toBe($value);
+    return $this;
+});
+
+expect()->extend('toHaveBodyContaining', function (string $needle) {
+    $body = $this->value->getBody();
+    $body->rewind();
+    expect($body->getContents())->toContain($needle);
+    return $this;
+});
+
+expect()->extend('toHaveCookie', function (string $name) {
+    $cookies = getResponseCookies($this->value);
+    expect($cookies)->toHaveKey($name);
+    return $this;
+});
+
+expect()->extend('toHaveLog', function (string $level, string $message) {
+    expect($this->value->logHandler())->hasRecord($message, $level);
+});
+
+trait TestHelpers
+{
+    private ?PsrContainer $container = null;
+
+    private ?ServerRequestInterface $emptyRequest = null;
+
+    private ?ServerRequestInterface $lastRequest = null;
+
+    private ?array $cookie = null;
+
+    public function newUser(string $email = 'foo@example.com', string $password = 'bar'): User
+    {
+        $user = new User($email);
+        if ($password !== null) {
+            $user = $user->withPassword($password);
+        }
+        return $user;
+    }
+
+    public function addUser(?User $user = null): User
+    {
+        if ($user === null) {
+            $user = $this->newUser();
+        }
+        return $this->get(UserService::class)->persistUser($user);
+    }
+
+    /**
+     * @param array<string, mixed> $overrides
+     */
+    public function get(string $key, array $overrides = []): mixed
+    {
+        if ($this->container === null) {
+            $container = new Container;
+            $container->register(new PimpleServiceProvider);
+            foreach ($overrides as $overrideKey => $overrideFn) {
+                $container[$overrideKey] = $overrideFn;
+            }
+
+            // Add test handler to logger to allow logs to be inspected
+            $container[TestHandler::class] = fn() => new TestHandler;
+            $container[Logger::class] = function ($c) {
+                $logger = new Logger('dibby-tests');
+                /** @var TestHandler */
+                $handler = $c[TestHandler::class];
+                $logger->pushHandler($handler);
+                return $logger;
+            };
+
+            // Use a middleware to log requests, responses, and exceptions for inspection
+            $container[LoggerMiddleware::class] = fn($c) => new LoggerMiddleware(
+                $c[LoggerInterface::class],
+            );
+            $container->extend(Router::class, function (Router $router, $c) {
+                /** @var LoggerMiddleware */
+                $middleware = $c[LoggerMiddleware::class];
+                $router->middleware($middleware);
+                return $router;
+            });
+
+            /**
+             * Minimize password hashing cost to reduce impact on test runtime.
+             *
+             * "The... cost parameter... must be in range 04-31..."
+             *
+             * @see https://www.php.net/crypt
+             */
+            $container[DefaultPasswordHasher::class] = new DefaultPasswordHasher(cost: 4);
+
+            // Make the "current" request configurable
+            $this->emptyRequest = $container[ServerRequestCreatorInterface::class]->fromArrays([
+                'REQUEST_METHOD' => 'GET',
+            ]);
+            $this->lastRequest = clone $this->emptyRequest;
+            $container[ServerRequestInterface::class] = fn() => $this->lastRequest;
+
+            $this->container = new PsrContainer($container);
+        }
+
+        return $this->container->get($key);
+    }
+
+    /**
+     * @param ?array<string, string> $body
+     * @param array<string, string> $headers
+     * @param ?array<string, string> $query
+     * @param ?array<string, string> $cookie
+     */
+    public function request(
+        string $target,
+        string $method = 'GET',
+        ?array $body = null,
+        array $headers = [],
+        ?array $query = null,
+        ?array $cookie = null,
+        ?User $user = null,
+    ): ServerRequestInterface {
+        $request = (clone $this->emptyRequest)
+            ->withRequestTarget($target)
+            ->withUri($this->emptyRequest->getUri()->withPath($target))
+            ->withMethod($method);
+
+        if ($body !== null) {
+            $request = $request->withParsedBody($body);
+        }
+
+        foreach ($headers as $header => $value) {
+            $request = $request->withHeader($header, $value);
+        }
+
+        if ($query !== null) {
+            $request = $request->withQueryParams($query);
+        }
+
+        if ($cookie !== null) {
+            $request = $request->withCookieParams($cookie);
+        } elseif ($this->cookie !== null) {
+            $request = $request->withCookieParams($this->cookie);
+        }
+
+        if ($user !== null) {
+            $request = $request->withAttribute('user', $user);
+        }
+
+        $this->lastRequest = $request;
+
+        return $request;
+    }
+
+    public function handle(ServerRequestInterface $request): ResponseInterface
+    {
+        /** @var Appliation */
+        $app = $this->get(Application::class);
+        $response = $app->handle($request);
+        $this->cookie = getResponseCookies($response);
+        return $response;
+    }
+
+    public function reset(): void
+    {
+        /** @var DoctrineConnectionFactory */
+        $connectionFactory = $this->get(DoctrineConnectionFactory::class);
+        $connection = $connectionFactory->getWriteConnection();
+
+        $tables = [
+            'user',
+        ];
+        foreach ($tables as $table) {
+            $connection
+                ->createQueryBuilder()
+                ->delete($connection->quoteIdentifier($table))
+                ->executeStatement();
+        }
+
+        $this->container = null;
+        $this->cookie = null;
+    }
+
+    public function logIn(?User $user = null): ResponseInterface
+    {
+        if ($user === null) {
+            $user = $this->addUser();
+        }
+
+        $request = $this->request(
+            target: '/login',
+            method: 'POST',
+            body: [
+                'email' => $user->getEmail(),
+                'password' => $user->getPassword(),
+            ],
+        );
+
+        return $this->handle($request);
+    }
+
+    public function config(): Configuration
+    {
+        return $this->get(Configuration::class);
+    }
+
+    public function jwt(array $payload): void
+    {
+        $token = $this->get(JwtAdapter::class)->encode($payload);
+        $this->cookie[$this->config()->getSessionCookie()] = $token;
+    }
+
+    public function logHandler(): TestHandler
+    {
+        /** @var TestHandler */
+        return $this->get(TestHandler::class);
+    }
+
+    public function logs(): void
+    {
+        expect($this->logHandler()->getRecords())->dd();
+    }
+}
+
+uses(TestHelpers::class)->in(__DIR__);
+
+uses()
+    ->beforeEach(function () {
+        $this->reset();
+    })
+    ->in(__DIR__);

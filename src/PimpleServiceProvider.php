@@ -6,7 +6,6 @@ use DateTimeImmutable;
 
 use Doctrine\DBAL\{
     Connection,
-    Logging\DebugStack,
     Logging\SQLLogger,
 };
 
@@ -18,17 +17,27 @@ use Elazar\Dibby\Configuration\{
 };
 
 use Elazar\Dibby\Controller\{
-    GetIndexController,
+    DashboardController,
+    IndexController,
+    LoginController,
+    PasswordController,
+    RegisterController,
+    ResponseGenerator,
 };
 
 use Elazar\Dibby\Database\{
     DatabaseConnectionFactory,
     DoctrineConnectionFactory,
+    DoctrineSQLLogger,
+    Migrations\CliConfig,
 };
 
 use Elazar\Dibby\Jwt\{
+    FirebaseJwtAdapter,
+    JwtAdapter,
     JwtMiddleware,
     JwtRequestTransformer,
+    JwtResponseTransformer,
     UserJwtRequestTransformer,
 };
 
@@ -39,8 +48,13 @@ use Elazar\Dibby\Template\{
 };
 
 use Elazar\Dibby\User\{
+    DefaultPasswordHasher,
+    DefaultResetTokenGenerator,
     DoctrineUserRepository,
-    UserRepositoryInterface,
+    PasswordHasher,
+    ResetTokenGenerator,
+    UserRepository,
+    UserService,
 };
 
 use Laminas\HttpHandlerRunner\Emitter\{
@@ -121,12 +135,25 @@ class PimpleServiceProvider implements ServiceProviderInterface
 
         // PSR-15 middleware implementations
         $pimple[DateTimeImmutable::class] = new DateTimeImmutable;
+        $pimple[UserJwtRequestTransformer::class] = fn($c) => new UserJwtRequestTransformer(
+            $c[UserRepository::class],
+            $c[LoggerInterface::class],
+        );
         $pimple[JwtRequestTransformer::class] = fn($c) => $c[UserJwtRequestTransformer::class];
+        $pimple[FirebaseJwtAdapter::class] = fn($c) => new FirebaseJwtAdapter(
+            $c[Configuration::class]->getSessionKey(),
+        );
+        $pimple[JwtAdapter::class] = fn($c) => $c[FirebaseJwtAdapter::class];
         $pimple[JwtMiddleware::class] = fn($c) => new JwtMiddleware(
             $c[LoggerInterface::class],
             $c[JwtRequestTransformer::class],
+            $c[JwtAdapter::class],
+            $c[JwtResponseTransformer::class],
+            $c[Configuration::class]->getSessionCookie(),
+        );
+        $pimple[JwtResponseTransformer::class] = fn($c) => new JwtResponseTransformer(
             $c[DateTimeImmutable::class],
-            $c[Configuration::class]->getSessionKey(),
+            $c[Configuration::class]->getSessionCookie(),
             $c[Configuration::class]->getSessionTimeToLive(),
         );
 
@@ -150,6 +177,7 @@ class PimpleServiceProvider implements ServiceProviderInterface
         $pimple[Application::class] = fn($c) => new Application(
             $c[ServerRequestInterface::class],
             $c[RequestHandlerInterface::class],
+            $c[ResponseFactoryInterface::class],
             $c[EmitterInterface::class],
         );
         $pimple[RouteConfiguration::class] = fn() => new RouteConfiguration;
@@ -171,7 +199,7 @@ class PimpleServiceProvider implements ServiceProviderInterface
         // Logger
         $pimple[Logger::class] = function ($c) {
             $handler = new StreamHandler('php://stderr');
-            $handler->setFormatter(new NormalizerFormatter);
+            /* $handler->setFormatter(new NormalizerFormatter); */
             $logger = new Logger('dibby');
             $logger->pushHandler($handler);
             return $logger;
@@ -185,25 +213,62 @@ class PimpleServiceProvider implements ServiceProviderInterface
         $pimple[Configuration::class] = fn($c) => $c[ConfigurationFactory::class]->getConfiguration();
 
         // Doctrine
-        $pimple[DebugStack::class] = fn($c) => new DebugStack;
-        $pimple[SQLLogger::class] = fn($c) => $c[DebugStack::class];
+        $pimple[DoctrineSQLLogger::class] = fn($c) => new DoctrineSQLLogger(
+            $c[LoggerInterface::class],
+        );
+        $pimple[SQLLogger::class] = fn($c) => $c[DoctrineSQLLogger::class];
         $pimple[DoctrineConnectionFactory::class] = fn($c) => new DoctrineConnectionFactory(
             $c[Configuration::class]->getDatabaseReadConfiguration(),
             $c[Configuration::class]->getDatabaseWriteConfiguration(),
             $c[SQLLogger::class],
         );
         $pimple[DatabaseConnectionFactory::class] = fn($c) => $c[DoctrineConnectionFactory::class];
+        $pimple[CliConfig::class] = fn($c) => new CliConfig($c[DoctrineConnectionFactory::class]);
 
         // Users
+        $pimple[DefaultPasswordHasher::class] = fn() => new DefaultPasswordHasher;
+        $pimple[PasswordHasher::class] = fn($c) => $c[DefaultPasswordHasher::class];
+        $pimple[DefaultResetTokenGenerator::class] = fn() => new DefaultResetTokenGenerator;
+        $pimple[ResetTokenGenerator::class] = fn($c) => $c[DefaultResetTokenGenerator::class];
         $pimple[DoctrineUserRepository::class] = fn($c) => new DoctrineUserRepository(
             $c[DoctrineConnectionFactory::class],
+            $c[LoggerInterface::class],
         );
-        $pimple[UserRepositoryInterface::class] = fn($c) => $c[DoctrineUserRepository::class];
+        $pimple[UserRepository::class] = fn($c) => $c[DoctrineUserRepository::class];
+        $pimple[UserService::class] = fn($c) => new UserService(
+            $c[UserRepository::class],
+            $c[PasswordHasher::class],
+            $c[ResetTokenGenerator::class],
+            $c[DateTimeImmutable::class],
+            $c[Configuration::class]->getResetTokenTimeToLive(),
+        );
 
         // Controllers
-        $pimple[GetIndexController::class] = fn($c) => new GetIndexController(
+        $pimple[DashboardController::class] = fn($c) => new DashboardController(
+            $c[ResponseGenerator::class],
+        );
+        $pimple[IndexController::class] = fn($c) => new IndexController(
+            $c[ResponseGenerator::class],
+            $c[UserRepository::class],
+        );
+        $pimple[ResponseGenerator::class] = fn($c) => new ResponseGenerator(
             $c[ResponseFactoryInterface::class],
+            $c[TemplateEngine::class],
             $c[RouteConfiguration::class],
+            $c[JwtAdapter::class],
+            $c[JwtResponseTransformer::class],
+        );
+        $pimple[LoginController::class] = fn($c) => new LoginController(
+            $c[ResponseGenerator::class],
+            $c[UserService::class],
+        );
+        $pimple[PasswordController::class] = fn($c) => new PasswordController(
+            $c[ResponseGenerator::class],
+        );
+        $pimple[RegisterController::class] = fn($c) => new RegisterController(
+            $c[ResponseGenerator::class],
+            $c[UserRepository::class],
+            $c[UserService::class],
         );
     }
 }

@@ -1,0 +1,12 @@
+parameters:
+    level: 9
+    paths:
+        - src
+        - tests
+    ignoreErrors:
+        -
+            message: '#Undefined variable: \$this#'
+            path: tests/*
+        -
+            message: '#Call to an undefined method#'
+            path: tests/*

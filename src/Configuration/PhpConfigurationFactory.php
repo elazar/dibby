@@ -26,7 +26,9 @@ class PhpConfigurationFactory implements ConfigurationFactory
             $databaseReadConfiguration,
             $databaseWriteConfiguration,
             $settings['session']['key'],
-            (int) $settings['session']['ttl'],
+            $settings['session']['cookie'] ?? 'token',
+            $settings['session']['ttl'] ?? 'P30M',
+            $settings['reset_token']['ttl'] ?? 'P30M',
         );
     }
 
