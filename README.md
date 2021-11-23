@@ -20,7 +20,7 @@ docker-compose up -d
 docker-compose run --rm composer run-script migrate
 ```
 
-### Local
+### Manual
 
 You'll need:
 
@@ -44,4 +44,4 @@ php ./vendor/bin/doctrine-migrations migrate
 
 ## Usage
 
-Assuming you've performed installation on your local machine, navigate to [http://localhost:8080](http://localhost:8080) to continue. Otherwise, navigate to the appropriate host and port for your installation.
+Assuming you've performed the installation using Docker, navigate to [http://localhost:8080](http://localhost:8080) to continue. Otherwise, navigate to the appropriate host and port for your hosting setup.
