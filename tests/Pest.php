@@ -13,22 +13,29 @@ use Elazar\Dibby\{
     User\User,
     User\UserService,
 };
+
 use Laminas\Mail\{
     Message,
     Transport\InMemory,
     Transport\TransportInterface,
 };
+
 use League\Route\Router;
+
 use Monolog\{
     Handler\TestHandler,
     Logger,
 };
+
 use Nyholm\Psr7Server\ServerRequestCreatorInterface;
+
 use Pimple\{
     Container,
     Psr11\Container as PsrContainer,
 };
+
 use Psr\Log\LoggerInterface;
+
 use Psr\Http\{
     Message\ResponseInterface,
     Message\ServerRequestInterface,
@@ -103,8 +110,10 @@ trait TestHelpers
 
     private ?array $cookie = null;
 
-    public function newUser(string $email = 'foo@example.com', string $password = 'bar'): User
-    {
+    public function newUser(
+        string $email = 'foo@example.com',
+        string $password = 'bar',
+    ): User {
         $user = new User($email);
         if ($password !== null) {
             $user = $user->withPassword($password);
@@ -120,17 +129,11 @@ trait TestHelpers
         return $this->get(UserService::class)->persistUser($user);
     }
 
-    /**
-     * @param array<string, mixed> $overrides
-     */
-    public function get(string $key, array $overrides = []): mixed
+    public function get(string $key): mixed
     {
         if ($this->container === null) {
             $container = new Container;
             $container->register(new PimpleServiceProvider);
-            foreach ($overrides as $overrideKey => $overrideFn) {
-                $container[$overrideKey] = $overrideFn;
-            }
 
             // Use in-memory transport to allow e-mails to be inspected
             $this->emailTransport = new InMemory;

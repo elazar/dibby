@@ -22,6 +22,7 @@ use Elazar\Dibby\Controller\{
     LoginController,
     PasswordController,
     RegisterController,
+    ResetController,
     ResponseGenerator,
 };
 
@@ -69,7 +70,8 @@ use Laminas\HttpHandlerRunner\Emitter\{
 };
 
 use Laminas\Mail\Transport\{
-    Sendmail,
+    Smtp,
+    SmtpOptions,
     TransportInterface,
 };
 
@@ -236,10 +238,13 @@ class PimpleServiceProvider implements ServiceProviderInterface
         $pimple[DatabaseConnectionFactory::class] = fn($c) => $c[DoctrineConnectionFactory::class];
         $pimple[CliConfig::class] = fn($c) => new CliConfig($c[DoctrineConnectionFactory::class]);
 
-
         // E-mail
-        $pimple[Sendmail::class] = fn() => new Sendmail;
-        $pimple[TransportInterface::class] = fn($c) => $c[Sendmail::class];
+        $pimple[SmtpOptions::class] = fn($c) => new SmtpOptions([
+            'host' => $c[Configuration::class]->getSmtpHost(),
+            'port' => (int) $c[Configuration::class]->getSmtpPort(),
+        ]);
+        $pimple[Smtp::class] = fn($c) => new Smtp($c[SmtpOptions::class]);
+        $pimple[TransportInterface::class] = fn($c) => $c[Smtp::class];
         $pimple[LaminasEmailAdapter::class] = fn($c) => new LaminasEmailAdapter(
             $c[TransportInterface::class],
             $c[LoggerInterface::class],
@@ -248,6 +253,7 @@ class PimpleServiceProvider implements ServiceProviderInterface
         $pimple[EmailService::class] = fn($c) => new EmailService(
             $c[EmailAdapter::class],
             $c[TemplateEngine::class],
+            $c[RouteConfiguration::class],
             $c[Configuration::class]->getFromEmail(),
             $c[Configuration::class]->getBaseUrl(),
         );
@@ -267,6 +273,7 @@ class PimpleServiceProvider implements ServiceProviderInterface
             $c[PasswordHasher::class],
             $c[ResetTokenGenerator::class],
             $c[EmailService::class],
+            $c[LoggerInterface::class],
             $c[DateTimeImmutable::class],
             $c[Configuration::class]->getResetTokenTimeToLive(),
         );
@@ -297,6 +304,10 @@ class PimpleServiceProvider implements ServiceProviderInterface
         $pimple[RegisterController::class] = fn($c) => new RegisterController(
             $c[ResponseGenerator::class],
             $c[UserRepository::class],
+            $c[UserService::class],
+        );
+        $pimple[ResetController::class] = fn($c) => new ResetController(
+            $c[ResponseGenerator::class],
             $c[UserService::class],
         );
     }

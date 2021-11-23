@@ -13,7 +13,7 @@ class DefaultResetTokenGenerator implements ResetTokenGenerator
      * @param ?callable $encoder
      */
     public function __construct(
-        private int $length = 64,
+        private int $length = 32,
         $encoder = null,
     ) {
         $this->encoder = $encoder ?? fn(string $s): string => bin2hex($s);

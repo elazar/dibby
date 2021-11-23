@@ -31,6 +31,8 @@ class PhpConfigurationFactory implements ConfigurationFactory
             $settings['session']['cookie'],
             $settings['session']['ttl'],
             $settings['reset_token_ttl'],
+            $settings['smtp']['host'],
+            $settings['smtp']['port'],
         );
     }
 

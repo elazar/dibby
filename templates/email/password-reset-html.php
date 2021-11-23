@@ -4,7 +4,7 @@
 
 <p>If that someone was you, you can visit this link to complete the reset process:</p>
 
-<p><a href="<?= $this->e($baseUrl . '/reset?token=' . $resetToken) ?> ?>"><?= $this->e($baseUrl . '/reset?token=' . $resetToken) ?></a></p>
+<p><a href="<?= $this->e($resetUrl) ?>"><?= $this->e($resetUrl) ?></a></p>
 
 <p>If you did not initiate this password reset, you can safely ignore this message.</p>
 

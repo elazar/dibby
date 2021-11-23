@@ -11,6 +11,7 @@ use Elazar\Dibby\{
     User\ResetTokenGenerator,
     User\UserRepository,
 };
+use Psr\Log\LoggerInterface;
 
 class UserService
 {
@@ -19,6 +20,7 @@ class UserService
         private PasswordHasher $passwordHasher,
         private ResetTokenGenerator $resetTokenGenerator,
         private EmailService $emailService,
+        private LoggerInterface $logger,
         private DateTimeImmutable $now,
         private string $resetTokenTimeToLive,
     ) { }
@@ -40,12 +42,19 @@ class UserService
     {
         try {
             $user = $this->userRepository->getUserByEmail($email);
-        } catch (Exception $e) {
+        } catch (Exception $error) {
+            $this->logger->warning('Failed to authenticate user', [
+                'email' => $email,
+                'error' => $error,
+            ]);
             return null;
         }
 
         $passwordHash = $user->getPasswordHash();
         if ($passwordHash === null) {
+            $this->logger->warning('User has no password hash', [
+                'email' => $email,
+            ]);
             return null;
         }
 
@@ -57,16 +66,26 @@ class UserService
     {
         try {
             $user = $this->userRepository->getUserByEmail($email);
-        } catch (Exception $e) {
+        } catch (Exception $error) {
+            $this->logger->warning('Failed to start password reset', [
+                'email' => $email,
+                'error' => $error,
+            ]);
             return null;
         }
 
+        /** @var string */
+        $userId = $user->getId();
         $resetToken = $this->resetTokenGenerator->generateToken();
 
         $expirationInterval = new DateInterval($this->resetTokenTimeToLive);
         $resetTokenExpiration = $this->now->add($expirationInterval);
 
-        $result = $this->emailService->sendPasswordResetEmail($email, $resetToken);
+        $result = $this->emailService->sendPasswordResetEmail(
+            toEmail: $email,
+            userId: $userId,
+            resetToken: $resetToken,
+        );
         if ($result === false) {
             return null;
         }
@@ -82,12 +101,24 @@ class UserService
     {
         try {
             $user = $this->userRepository->getUserById($userId);
-        } catch (Exception $e) {
+        } catch (Exception $error) {
+            $this->logger->warning('Failed to verify password reset', [
+                'user' => $userId,
+                'token' => $resetToken,
+                'error' => $error,
+            ]);
             return null;
         }
 
         if ($user->getResetTokenExpiration() < $this->now
             || $user->getResetToken() !== $resetToken) {
+            $this->logger->notice('Failed to verify password reset', [
+                'user' => $userId,
+                'token' => $resetToken,
+                'now' => $this->now,
+                'user_token' => $user->getResetToken(),
+                'user_token_expiration' => $user->getResetTokenExpiration(),
+            ]);
             return null;
         }
 

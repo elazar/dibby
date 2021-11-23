@@ -2,7 +2,7 @@
 
 return [
 
-    'base_url' => 'localhost:8080',
+    'base_url' => 'http://localhost:8080',
     'from_email' => 'no-reply@getdibby.com',
     'reset_token_ttl' => 'PT30M',
 
@@ -32,6 +32,11 @@ return [
         'key' => 'ChangeMe',
         'cookie' => 'token',
         'ttl' => 'PT30M',
+    ],
+
+    'smtp' => [
+        'host' => 'mailhog',
+        'port' => 1025,
     ],
 
 ];

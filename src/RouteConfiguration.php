@@ -8,6 +8,7 @@ use Elazar\Dibby\Controller\{
     LoginController,
     PasswordController,
     RegisterController,
+    ResetController,
 };
 use League\Route\Router;
 
@@ -31,6 +32,8 @@ class RouteConfiguration
             ['POST', '/login', LoginController::class, 'post_login'],
             ['GET', '/password', PasswordController::class, 'get_password'],
             ['POST', '/password', PasswordController::class, 'post_password'],
+            ['GET', '/reset', ResetController::class, 'get_reset'],
+            ['POST', '/reset', ResetController::class, 'post_reset'],
             ['GET', '/register', RegisterController::class, 'get_register'],
             ['POST', '/register', RegisterController::class, 'post_register'],
             ['GET', '/dashboard', DashboardController::class, 'get_dashboard'],

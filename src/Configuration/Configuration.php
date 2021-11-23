@@ -15,6 +15,8 @@ class Configuration
         private string $sessionCookie,
         private string $sessionTimeToLive,
         private string $resetTokenTimeToLive,
+        private string $smtpHost,
+        private int $smtpPort,
     ) { }
 
     public function getDatabaseReadConfiguration(): DatabaseConfiguration
@@ -55,5 +57,15 @@ class Configuration
     public function getResetTokenTimeToLive(): string
     {
         return $this->resetTokenTimeToLive;
+    }
+
+    public function getSmtpHost(): string
+    {
+        return $this->smtpHost;
+    }
+
+    public function getSmtpPort(): int
+    {
+        return $this->smtpPort;
     }
 }

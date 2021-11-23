@@ -27,6 +27,7 @@
         "firebase/php-jwt": "^5.5",
         "laminas/laminas-httphandlerrunner": "^2.1",
         "laminas/laminas-mail": "^2.15",
+        "laminas/laminas-servicemanager": "^3.10",
         "league/plates": "^3.4",
         "league/route": "^5.1",
         "monolog/monolog": "^2.3",

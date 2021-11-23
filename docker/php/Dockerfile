@@ -23,6 +23,7 @@ RUN apk add php8-pecl-xdebug && \
     ln -s $SRC_MODULES/xdebug.so $DST_MODULES/xdebug.so
 
 COPY xdebug.ini $DST_CONFIG/50_xdebug.ini
+COPY overrides.ini $DST_CONFIG/99_overrides.ini
 
 RUN apk del build-base php8-dev
 

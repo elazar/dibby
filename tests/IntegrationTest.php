@@ -33,6 +33,7 @@ it('displays error when registering with invalid input', function (array $body, 
     $response = $this->handle($request);
     expect($response)
         ->toHaveStatusCode(400)
+        ->toHaveHeader('Content-Type', 'text/html')
         ->toHaveBodyContaining($error);
 })->with([
     'invalid e-mail' => [
@@ -101,7 +102,7 @@ it('displays error for unrecognized user on login page', function () {
     expect($response)
         ->toHaveStatusCode(403)
         ->toHaveHeader('Content-Type', 'text/html')
-        ->toHaveBodyContaining('Unrecognized e-mail or password.');
+        ->toHaveBodyContaining('Unrecognized e-mail or password');
 });
 
 it('authenticates recognized user', function () {
@@ -111,7 +112,7 @@ it('authenticates recognized user', function () {
         ->toHaveHeader('Location', '/dashboard');
 });
 
-it('displays password reset page', function () {
+it('displays password page', function () {
     $request = $this->request(target: '/password');
     $response = $this->handle($request);
     expect($response)
@@ -166,7 +167,7 @@ it('redirects to login page when JWT token subject is not recognized', function 
     expect($this)->toHaveLog('warning', 'Error retrieving JWT user');
 });
 
-it('displays error for unrecognized user on password reset page', function () {
+it('displays error for unrecognized user on password page', function () {
     $user = $this->newUser();
     $request = $this->request(
         target: '/password',
@@ -178,10 +179,11 @@ it('displays error for unrecognized user on password reset page', function () {
     $response = $this->handle($request);
     expect($response)
         ->toHaveStatusCode(400)
-        ->toHaveBodyContaining('Error: Unable to reset password for specified e-mail.');
+        ->toHaveHeader('Content-Type', 'text/html')
+        ->toHaveBodyContaining('Error: Unable to reset password for specified e-mail');
 });
 
-it('displays confirmation for recognized user on password reset page', function () {
+it('displays confirmation for recognized user on password page', function () {
     $user = $this->addUser();
     $request = $this->request(
         target: '/password',
@@ -193,7 +195,171 @@ it('displays confirmation for recognized user on password reset page', function 
     $response = $this->handle($request);
     expect($response)
         ->toHaveStatusCode(200)
-        ->toHaveBodyContaining('Password reset e-mail sent.');
+        ->toHaveHeader('Content-Type', 'text/html')
+        ->toHaveBodyContaining('Password reset e-mail sent');
     expect($this)
         ->toSendEmail($user->getEmail(), 'Dibby Password Reset');
+});
+
+it('displays error when loading reset page with invalid parameters', function () {
+    $request = $this->request(
+        target: '/reset',
+        query: [
+            'user' => 'foo',
+            'token' => 'bar',
+        ],
+    );
+    $response = $this->handle($request);
+    expect($response)
+        ->toHaveStatusCode(400)
+        ->toHaveHeader('Content-Type', 'text/html')
+        ->toHaveBodyContaining('Error: Password reset link expired or invalid');
+});
+
+it('displays error when submitting reset form with invalid parameters', function () {
+    $request = $this->request(
+        target: '/reset',
+        method: 'POST',
+        body: [
+            'user' => 'foo',
+            'token' => 'bar',
+            'password' => 'baz',
+        ],
+    );
+    $response = $this->handle($request);
+    expect($response)
+        ->toHaveStatusCode(400)
+        ->toHaveHeader('Content-Type', 'text/html')
+        ->toHaveBodyContaining('Error: Password reset link expired or invalid');
+});
+
+it('displays error when loading reset page with expired token', function () {
+    $token = 'foo';
+    $user = $this->addUser(
+        $this->newUser()
+             ->withResetToken($token)
+             ->withResetTokenExpiration(
+                 new DateTimeImmutable('2021-11-23T19:00:00Z'),
+             ),
+    );
+    $request = $this->request(
+        target: '/reset',
+        query: [
+            'user' => $user->getId(),
+            'token' => $token,
+        ],
+    );
+    $response = $this->handle($request);
+    expect($response)
+        ->toHaveStatusCode(400)
+        ->toHaveHeader('Content-Type', 'text/html')
+        ->toHaveBodyContaining('Error: Password reset link expired or invalid');
+});
+
+it('displays error when submitting reset form with expired token', function () {
+    $token = 'foo';
+    $user = $this->addUser(
+        $this->newUser()
+             ->withResetToken($token)
+             ->withResetTokenExpiration(
+                 new DateTimeImmutable('2021-11-23T19:00:00Z'),
+             ),
+    );
+    $request = $this->request(
+        target: '/reset',
+        method: 'POST',
+        body: [
+            'user' => $user->getId(),
+            'token' => $token,
+            'password' => 'baz',
+        ],
+    );
+    $response = $this->handle($request);
+    expect($response)
+        ->toHaveStatusCode(400)
+        ->toHaveHeader('Content-Type', 'text/html')
+        ->toHaveBodyContaining('Error: Password reset link expired or invalid');
+});
+
+it('displays reset page with valid parameters', function () {
+    $token = 'foo';
+    $user = $this->addUser(
+        $this->newUser()
+             ->withResetToken($token)
+             ->withResetTokenExpiration(
+                 new DateTimeImmutable('+30 minutes'),
+             ),
+    );
+    $request = $this->request(
+        target: '/reset',
+        query: [
+            'user' => $user->getId(),
+            'token' => $token,
+        ],
+    );
+    $response = $this->handle($request);
+    expect($response)
+        ->toHaveStatusCode(200)
+        ->toHaveHeader('Content-Type', 'text/html')
+        ->toHaveBodyContaining('New Password');
+});
+
+it('displays error when submitting reset form with empty password', function () {
+    $token = 'foo';
+    $user = $this->addUser(
+        $this->newUser()
+             ->withResetToken($token)
+             ->withResetTokenExpiration(
+                 new DateTimeImmutable('+30 minutes'),
+             ),
+    );
+    $request = $this->request(
+        target: '/reset',
+        method: 'POST',
+        body: [
+            'user' => $user->getId(),
+            'token' => $token,
+            'password' => '',
+        ],
+    );
+    $response = $this->handle($request);
+    expect($response)
+        ->toHaveStatusCode(400)
+        ->toHaveHeader('Content-Type', 'text/html')
+        ->toHaveBodyContaining('Error: Password is required');
+});
+
+it('resets password successfully', function () {
+    $token = 'foo';
+    $password = 'foobar';
+    $user = $this->addUser(
+        $this->newUser()
+             ->withResetToken($token)
+             ->withResetTokenExpiration(
+                 new DateTimeImmutable('+30 minutes'),
+             ),
+    );
+    $request = $this->request(
+        target: '/reset',
+        method: 'POST',
+        body: [
+            'user' => $user->getId(),
+            'token' => $token,
+            'password' => $password,
+        ],
+    );
+    $response = $this->handle($request);
+    expect($response)
+        ->toHaveStatusCode(200)
+        ->toHaveHeader('Content-Type', 'text/html')
+        ->toHaveBodyContaining('Password reset successfully');
+    $response = $this->logIn($user);
+    expect($response)
+        ->toHaveStatusCode(403)
+        ->toHaveHeader('Content-Type', 'text/html')
+        ->toHaveBodyContaining('Unrecognized e-mail or password');
+    $response = $this->logIn($user->withPassword($password));
+    expect($response)
+        ->toHaveStatusCode(302)
+        ->toHaveHeader('Location', '/dashboard');
 });

@@ -28,6 +28,17 @@ services:
     volumes:
       - "pgsql:/var/lib/postgresql/data"
 
+  mailhog:
+    image: mailhog/mailhog
+    environment:
+      MH_STORAGE: maildir
+    ports:
+      - "8025:8025"
+    volumes:
+      - "mailhog:/maildir"
+
 volumes:
 
   pgsql:
+
+  mailhog:

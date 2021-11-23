@@ -2,22 +2,33 @@
 
 namespace Elazar\Dibby\Email;
 
-use Elazar\Dibby\Template\TemplateEngine;
+use Elazar\Dibby\{
+    RouteConfiguration,
+    Template\TemplateEngine,
+};
 
 class EmailService
 {
     public function __construct(
         private EmailAdapter $emailAdapter,
         private TemplateEngine $templateEngine,
+        private RouteConfiguration $routes,
         private string $fromEmail,
         private string $baseUrl,
     ) { }
 
-    public function sendPasswordResetEmail(string $toEmail, string $resetToken): bool
-    {
+    public function sendPasswordResetEmail(
+        string $toEmail,
+        string $userId,
+        string $resetToken,
+    ): bool {
+        $path = $this->routes->getPath('get_reset');
+        $resetUrl = $this->baseUrl . $path . '?' . http_build_query([
+            'user' => $userId,
+            'token' => $resetToken,
+        ]);
         $data = [
-            'baseUrl' => $this->baseUrl,
-            'resetToken' => $resetToken,
+            'resetUrl' => $resetUrl,
         ];
 
         $textBody = $this->templateEngine->render('email/password-reset-text', $data);
