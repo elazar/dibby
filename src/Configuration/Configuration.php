@@ -9,6 +9,8 @@ class Configuration
     public function __construct(
         private DatabaseConfiguration $databaseReadConfiguration,
         private DatabaseConfiguration $databaseWriteConfiguration,
+        private string $baseUrl,
+        private string $fromEmail,
         private string $sessionKey,
         private string $sessionCookie,
         private string $sessionTimeToLive,
@@ -23,6 +25,16 @@ class Configuration
     public function getDatabaseWriteConfiguration(): DatabaseConfiguration
     {
         return $this->databaseWriteConfiguration;
+    }
+
+    public function getBaseUrl(): string
+    {
+        return $this->baseUrl;
+    }
+
+    public function getFromEmail(): string
+    {
+        return $this->fromEmail;
     }
 
     public function getSessionKey(): string

@@ -32,6 +32,12 @@ use Elazar\Dibby\Database\{
     Migrations\CliConfig,
 };
 
+use Elazar\Dibby\Email\{
+    EmailAdapter,
+    EmailService,
+    LaminasEmailAdapter,
+};
+
 use Elazar\Dibby\Jwt\{
     FirebaseJwtAdapter,
     JwtAdapter,
@@ -60,6 +66,11 @@ use Elazar\Dibby\User\{
 use Laminas\HttpHandlerRunner\Emitter\{
     EmitterInterface,
     SapiEmitter,
+};
+
+use Laminas\Mail\Transport\{
+    Sendmail,
+    TransportInterface,
 };
 
 use League\Flysystem\{
@@ -225,6 +236,22 @@ class PimpleServiceProvider implements ServiceProviderInterface
         $pimple[DatabaseConnectionFactory::class] = fn($c) => $c[DoctrineConnectionFactory::class];
         $pimple[CliConfig::class] = fn($c) => new CliConfig($c[DoctrineConnectionFactory::class]);
 
+
+        // E-mail
+        $pimple[Sendmail::class] = fn() => new Sendmail;
+        $pimple[TransportInterface::class] = fn($c) => $c[Sendmail::class];
+        $pimple[LaminasEmailAdapter::class] = fn($c) => new LaminasEmailAdapter(
+            $c[TransportInterface::class],
+            $c[LoggerInterface::class],
+        );
+        $pimple[EmailAdapter::class] = fn($c) => $c[LaminasEmailAdapter::class];
+        $pimple[EmailService::class] = fn($c) => new EmailService(
+            $c[EmailAdapter::class],
+            $c[TemplateEngine::class],
+            $c[Configuration::class]->getFromEmail(),
+            $c[Configuration::class]->getBaseUrl(),
+        );
+
         // Users
         $pimple[DefaultPasswordHasher::class] = fn() => new DefaultPasswordHasher;
         $pimple[PasswordHasher::class] = fn($c) => $c[DefaultPasswordHasher::class];
@@ -239,6 +266,7 @@ class PimpleServiceProvider implements ServiceProviderInterface
             $c[UserRepository::class],
             $c[PasswordHasher::class],
             $c[ResetTokenGenerator::class],
+            $c[EmailService::class],
             $c[DateTimeImmutable::class],
             $c[Configuration::class]->getResetTokenTimeToLive(),
         );
@@ -264,6 +292,7 @@ class PimpleServiceProvider implements ServiceProviderInterface
         );
         $pimple[PasswordController::class] = fn($c) => new PasswordController(
             $c[ResponseGenerator::class],
+            $c[UserService::class],
         );
         $pimple[RegisterController::class] = fn($c) => new RegisterController(
             $c[ResponseGenerator::class],

@@ -95,7 +95,7 @@ it('displays login page', function () {
         ->toHaveHeader('Content-Type', 'text/html');
 });
 
-it('displays error for unrecognized user', function () {
+it('displays error for unrecognized user on login page', function () {
     $user = $this->newUser();
     $response = $this->logIn($user);
     expect($response)
@@ -164,4 +164,36 @@ it('redirects to login page when JWT token subject is not recognized', function 
         ->toHaveStatusCode(302)
         ->toHaveHeader('Location', '/login');
     expect($this)->toHaveLog('warning', 'Error retrieving JWT user');
+});
+
+it('displays error for unrecognized user on password reset page', function () {
+    $user = $this->newUser();
+    $request = $this->request(
+        target: '/password',
+        method: 'POST',
+        body: [
+            'email' => $user->getEmail(),
+        ],
+    );
+    $response = $this->handle($request);
+    expect($response)
+        ->toHaveStatusCode(400)
+        ->toHaveBodyContaining('Error: Unable to reset password for specified e-mail.');
+});
+
+it('displays confirmation for recognized user on password reset page', function () {
+    $user = $this->addUser();
+    $request = $this->request(
+        target: '/password',
+        method: 'POST',
+        body: [
+            'email' => $user->getEmail(),
+        ],
+    );
+    $response = $this->handle($request);
+    expect($response)
+        ->toHaveStatusCode(200)
+        ->toHaveBodyContaining('Password reset e-mail sent.');
+    expect($this)
+        ->toSendEmail($user->getEmail(), 'Dibby Password Reset');
 });

@@ -33,12 +33,12 @@ class ResponseGenerator
         ServerRequestInterface $request,
         string $template,
         array $data = [],
-    ): ResponseInterface
-    {
+        int $status = 200,
+    ): ResponseInterface {
         $params = array_merge((array) $request->getParsedBody(), $data);
         $body = $this->templateEngine->render($template, $params);
         $response = $this->responseFactory
-                         ->createResponse()
+                         ->createResponse($status)
                          ->withHeader('Content-Type', 'text/html');
         $response->getBody()->write($body);
         return $response;

@@ -2,6 +2,11 @@
 
 <div class="container mx-auto text-center">
   <h2 class="text-xl font-bold mb-6"><?= $this->e($title) ?></h2>
+
+  <?php if (isset($message)): ?>
+  <p class="font-bold mt-6 mb-6"><?= $this->e($message) ?></p>
+  <?php endif; ?>
+
   <form method="post" action="<?= $this->route('post_password') ?>">
     <div class="flex flex-col items-center">
 

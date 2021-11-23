@@ -2,6 +2,10 @@
 
 return [
 
+    'base_url' => 'localhost:8080',
+    'from_email' => 'no-reply@getdibby.com',
+    'reset_token_ttl' => 'PT30M',
+
     'db' => [
 
         'read' => [
@@ -27,10 +31,6 @@ return [
     'session' => [
         'key' => 'ChangeMe',
         'cookie' => 'token',
-        'ttl' => 'PT30M',
-    ],
-
-    'reset_token' => [
         'ttl' => 'PT30M',
     ],
 

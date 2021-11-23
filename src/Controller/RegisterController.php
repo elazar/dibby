@@ -45,7 +45,11 @@ class RegisterController
             }
         }
 
-        return $this->responseGenerator->render($request, 'register', $data)
-                                       ->withStatus($status);
+        return $this->responseGenerator->render(
+            request: $request,
+            template: 'register',
+            data: $data,
+            status: $status,
+        );
     }
 }

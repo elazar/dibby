@@ -22,14 +22,16 @@ class DoctrineUserRepository implements UserRepository
         if ($user->getId() === null) {
             $method = 'insert';
             $user = $user->withId(Uuid::uuid4());
+            $args = [];
         } else {
             $method = 'update';
+            $args = [['id' => $user->getId()]];
         }
 
         $connection = $this->connectionFactory->getWriteConnection();
         $table = $connection->quoteIdentifier(self::TABLE);
         $data = $user->toArray();
-        $connection->$method($table, $data);
+        $connection->$method($table, $data, ...$args);
 
         return $user;
     }

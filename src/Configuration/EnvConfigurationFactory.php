@@ -29,15 +29,17 @@ class EnvConfigurationFactory implements ConfigurationFactory
         return new Configuration(
             $databaseReadConfiguration,
             $databaseWriteConfiguration,
+            $this->getEnv('BASE_URL'),
+            $this->getEnv('FROM_EMAIL'),
             $this->getEnv('SESSION_KEY'),
-            $this->getEnv('SESSION_COOKIE') ?: 'token',
-            $this->getEnv('SESSION_TTL') ?: 'P30M',
-            $this->getEnv('RESET_TOKEN_TTL') ?: 'P30M',
+            $this->getEnv('SESSION_COOKIE'),
+            $this->getEnv('SESSION_TTL'),
+            $this->getEnv('RESET_TOKEN_TTL'),
         );
     }
 
     private function getEnv(string $name): string
     {
-        return getenv($name) ?: '';
+        return getenv("DIBBY_$name") ?: '';
     }
 }

@@ -13,6 +13,11 @@ use Elazar\Dibby\{
     User\User,
     User\UserService,
 };
+use Laminas\Mail\{
+    Message,
+    Transport\InMemory,
+    Transport\TransportInterface,
+};
 use League\Route\Router;
 use Monolog\{
     Handler\TestHandler,
@@ -76,6 +81,14 @@ expect()->extend('toHaveCookie', function (string $name) {
 
 expect()->extend('toHaveLog', function (string $level, string $message) {
     expect($this->value->logHandler())->hasRecord($message, $level);
+    return $this;
+});
+
+expect()->extend('toSendEmail', function (string $toEmail, string $subject) {
+    $message = $this->value->lastEmail();
+    expect($message->getTo()->has($toEmail))->toBeTrue();
+    expect($message->getSubject())->toBe($subject);
+    return $this;
 });
 
 trait TestHelpers
@@ -85,6 +98,8 @@ trait TestHelpers
     private ?ServerRequestInterface $emptyRequest = null;
 
     private ?ServerRequestInterface $lastRequest = null;
+
+    private ?InMemory $emailTransport = null;
 
     private ?array $cookie = null;
 
@@ -116,6 +131,10 @@ trait TestHelpers
             foreach ($overrides as $overrideKey => $overrideFn) {
                 $container[$overrideKey] = $overrideFn;
             }
+
+            // Use in-memory transport to allow e-mails to be inspected
+            $this->emailTransport = new InMemory;
+            $container[TransportInterface::class] = fn() => $this->emailTransport;
 
             // Add test handler to logger to allow logs to be inspected
             $container[TestHandler::class] = fn() => new TestHandler;
@@ -269,6 +288,11 @@ trait TestHelpers
     {
         /** @var TestHandler */
         return $this->get(TestHandler::class);
+    }
+
+    public function lastEmail(): ?Message
+    {
+        return $this->emailTransport?->getLastMessage();
     }
 
     public function logs(): void

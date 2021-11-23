@@ -34,8 +34,11 @@ class LoginController
             $status = 403;
         }
 
-        return $this->responseGenerator
-                    ->render($request, 'login', $data)
-                    ->withStatus($status);
+        return $this->responseGenerator->render(
+            request: $request,
+            template: 'login',
+            data: $data,
+            status: $status,
+        );
     }
 }

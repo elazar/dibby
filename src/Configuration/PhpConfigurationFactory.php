@@ -25,10 +25,12 @@ class PhpConfigurationFactory implements ConfigurationFactory
         return new Configuration(
             $databaseReadConfiguration,
             $databaseWriteConfiguration,
+            $settings['base_url'],
+            $settings['from_email'],
             $settings['session']['key'],
-            $settings['session']['cookie'] ?? 'token',
-            $settings['session']['ttl'] ?? 'P30M',
-            $settings['reset_token']['ttl'] ?? 'P30M',
+            $settings['session']['cookie'],
+            $settings['session']['ttl'],
+            $settings['reset_token_ttl'],
         );
     }
 

@@ -5,6 +5,7 @@ namespace Elazar\Dibby\User;
 use DateInterval;
 use DateTimeImmutable;
 use Elazar\Dibby\{
+    Email\EmailService,
     Exception,
     User\PasswordHasher,
     User\ResetTokenGenerator,
@@ -17,6 +18,7 @@ class UserService
         private UserRepository $userRepository,
         private PasswordHasher $passwordHasher,
         private ResetTokenGenerator $resetTokenGenerator,
+        private EmailService $emailService,
         private DateTimeImmutable $now,
         private string $resetTokenTimeToLive,
     ) { }
@@ -63,6 +65,11 @@ class UserService
 
         $expirationInterval = new DateInterval($this->resetTokenTimeToLive);
         $resetTokenExpiration = $this->now->add($expirationInterval);
+
+        $result = $this->emailService->sendPasswordResetEmail($email, $resetToken);
+        if ($result === false) {
+            return null;
+        }
 
         $user = $user
             ->withResetToken($resetToken)
