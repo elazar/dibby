@@ -27,6 +27,9 @@ class UserService
 
     public function persistUser(User $user): User
     {
+        if (empty($user->getName())) {
+            throw Exception::invalidInput('Name is required');
+        }
         if (!filter_var($user->getEmail(), \FILTER_VALIDATE_EMAIL)) {
             throw Exception::invalidInput('E-mail is invalid');
         }

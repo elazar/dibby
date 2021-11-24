@@ -1,13 +1,10 @@
 <?php
 
-namespace Elazar\Dibby\Migrations;
+namespace Elazar\Dibby\Database\Migrations;
 
-use Doctrine\{
-    DBAL\Schema\Schema,
-    Migrations\AbstractMigration,
-};
+use Doctrine\DBAL\Schema\Schema;
 
-final class Version20211121155701 extends AbstractMigration
+final class Version20211121155701 extends BaseMigration
 {
     public function getDescription(): string
     {
@@ -33,14 +30,5 @@ final class Version20211121155701 extends AbstractMigration
         $toSchema = clone $schema;
         $toSchema->dropTable('user');
         $this->migrate($schema, $toSchema);
-    }
-
-    private function migrate(Schema $fromSchema, Schema $toSchema): void
-    {
-        $platform = $this->connection->getDatabasePlatform();
-        $statements = $fromSchema->getMigrateToSql($toSchema, $platform);
-        foreach ($statements as $sql) {
-            $this->addSql($sql);
-        }
     }
 }

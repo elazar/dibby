@@ -11,6 +11,8 @@ class User
 
     private ?string $id = null;
 
+    private ?string $name = null;
+
     private ?string $password = null;
 
     private ?string $passwordHash = null;
@@ -26,6 +28,16 @@ class User
     public function getEmail(): string
     {
         return $this->email;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function withName(string $name): static
+    {
+        return $this->with('name', $name);
     }
 
     public function getPassword(): ?string
@@ -89,6 +101,10 @@ class User
             $user = $user->withId((string) $data['id']);
         }
 
+        if (isset($data['name'])) {
+            $user = $user->withName((string) $data['name']);
+        }
+
         if (isset($data['password'])) {
             $user = $user->withPassword($data['password']);
         }
@@ -117,6 +133,7 @@ class User
     {
         return array_filter([
             'id' => $this->id,
+            'name' => $this->name,
             'email' => $this->email,
             'password_hash' => $this->passwordHash,
             'reset_token' => $this->resetToken,

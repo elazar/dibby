@@ -40,6 +40,7 @@ it('displays error when registering with invalid input', function (array $body, 
         [
             'email' => 'foo',
             'password' => 'bar',
+            'name' => 'baz',
         ],
         'E-mail is invalid',
     ],
@@ -47,8 +48,17 @@ it('displays error when registering with invalid input', function (array $body, 
         [
             'email' => 'foo@example.com',
             'password' => '',
+            'name' => 'baz',
         ],
         'Password is required',
+    ],
+    'missing name' => [
+        [
+            'email' => 'foo@example.com',
+            'password' => 'bar',
+            'name' => '',
+        ],
+        'Name is required',
     ],
 ]);
 
@@ -60,6 +70,7 @@ it('registers valid user when no users exist', function () {
         body: [
             'email' => $user->getEmail(),
             'password' => $user->getPassword(),
+            'name' => $user->getName(),
         ],
     );
     $response = $this->handle($request);

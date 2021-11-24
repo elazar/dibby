@@ -12,6 +12,15 @@
 
       <div class="flex flex-col justify-start w-1/3 mb-3">
         <div class="block flex text-left">
+          <label for="name" class="text-lg">Name</label>
+        </div>
+        <div class="mt-1 block flex">
+          <input type="text" id="name" name="name" class="bg-gray-100 border border-gray-500 rounded-md shadow-md p-2 w-full">
+        </div>
+      </div>
+
+      <div class="flex flex-col justify-start w-1/3 mb-3">
+        <div class="block flex text-left">
           <label for="email" class="text-lg">E-mail</label>
         </div>
         <div class="mt-1 block flex">

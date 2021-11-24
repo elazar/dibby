@@ -113,12 +113,11 @@ trait TestHelpers
     public function newUser(
         string $email = 'foo@example.com',
         string $password = 'bar',
+        string $name = 'John',
     ): User {
-        $user = new User($email);
-        if ($password !== null) {
-            $user = $user->withPassword($password);
-        }
-        return $user;
+        return (new User($email))
+            ->withPassword($password)
+            ->withName($name);
     }
 
     public function addUser(?User $user = null): User
