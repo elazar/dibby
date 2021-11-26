@@ -3,12 +3,16 @@
 namespace Elazar\Dibby;
 
 use Elazar\Dibby\Controller\{
-    DashboardController,
+    AccountsController,
+    ActivityController,
+    HelpController,
     IndexController,
     LoginController,
     PasswordController,
     RegisterController,
     ResetController,
+    TransactionsController,
+    UsersController,
 };
 use League\Route\Router;
 
@@ -36,7 +40,11 @@ class RouteConfiguration
             ['POST', '/reset', ResetController::class, 'post_reset'],
             ['GET', '/register', RegisterController::class, 'get_register'],
             ['POST', '/register', RegisterController::class, 'post_register'],
-            ['GET', '/dashboard', DashboardController::class, 'get_dashboard'],
+            ['GET', '/transactions', TransactionsController::class, 'get_transactions'],
+            ['GET', '/accounts', AccountsController::class, 'get_accounts'],
+            ['GET', '/activity', ActivityController::class, 'get_activity'],
+            ['GET', '/users', UsersController::class, 'get_users'],
+            ['GET', '/help', HelpController::class, 'get_help'],
         ];
     }
 

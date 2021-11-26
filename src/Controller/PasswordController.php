@@ -18,7 +18,7 @@ class PasswordController
 
     public function __invoke(ServerRequestInterface $request): ResponseInterface
     {
-        $data = ['title' => 'Forgot Password'];
+        $data = [];
         $status = 200;
 
         if (strcasecmp($request->getMethod(), 'post') === 0) {

@@ -21,7 +21,7 @@ class IndexController
     {
         $route = match(true) {
             !$this->userRepository->hasUsers() => 'get_register',
-            $request->getAttribute('user') !== null => 'get_dashboard',
+            $request->getAttribute('user') !== null => 'get_transactions',
             default => 'get_login',
         };
         return $this->responseGenerator->redirect($route);

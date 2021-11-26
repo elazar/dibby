@@ -17,13 +17,17 @@ use Elazar\Dibby\Configuration\{
 };
 
 use Elazar\Dibby\Controller\{
-    DashboardController,
+    AccountsController,
+    ActivityController,
+    HelpController,
     IndexController,
     LoginController,
     PasswordController,
     RegisterController,
     ResetController,
     ResponseGenerator,
+    TransactionsController,
+    UsersController,
 };
 
 use Elazar\Dibby\Database\{
@@ -279,9 +283,6 @@ class PimpleServiceProvider implements ServiceProviderInterface
         );
 
         // Controllers
-        $pimple[DashboardController::class] = fn($c) => new DashboardController(
-            $c[ResponseGenerator::class],
-        );
         $pimple[IndexController::class] = fn($c) => new IndexController(
             $c[ResponseGenerator::class],
             $c[UserRepository::class],
@@ -309,6 +310,21 @@ class PimpleServiceProvider implements ServiceProviderInterface
         $pimple[ResetController::class] = fn($c) => new ResetController(
             $c[ResponseGenerator::class],
             $c[UserService::class],
+        );
+        $pimple[AccountsController::class] = fn($c) => new AccountsController(
+            $c[ResponseGenerator::class],
+        );
+        $pimple[ActivityController::class] = fn($c) => new ActivityController(
+            $c[ResponseGenerator::class],
+        );
+        $pimple[UsersController::class] = fn($c) => new UsersController(
+            $c[ResponseGenerator::class],
+        );
+        $pimple[HelpController::class] = fn($c) => new HelpController(
+            $c[ResponseGenerator::class],
+        );
+        $pimple[TransactionsController::class] = fn($c) => new TransactionsController(
+            $c[ResponseGenerator::class],
         );
     }
 }

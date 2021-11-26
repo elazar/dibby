@@ -58,7 +58,7 @@ class ResponseGenerator
             return $this->redirect('get_login'); // @codeCoverageIgnore
         }
         $jwt = $this->jwtAdapter->encode(['sub' => $userId]);
-        $response = $this->redirect('get_dashboard');
+        $response = $this->redirect('get_transactions');
         return $this->jwtResponseTransformer->transform($response, $jwt);
     }
 }

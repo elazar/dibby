@@ -7,7 +7,7 @@ use Psr\Http\Message\{
     ServerRequestInterface,
 };
 
-class DashboardController
+class ActivityController
 {
     public function __construct(
         private ResponseGenerator $responseGenerator,
@@ -22,9 +22,10 @@ class DashboardController
         }
 
         $data = [
-            'title' => 'Dashboard',
+            'title' => 'Activity',
+            'activeRoute' => 'get_activity',
             'userName' => $user->getName(),
         ];
-        return $this->responseGenerator->render($request, 'dashboard', $data);
+        return $this->responseGenerator->render($request, 'activity', $data);
     }
 }

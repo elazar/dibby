@@ -76,7 +76,7 @@ it('registers valid user when no users exist', function () {
     $response = $this->handle($request);
     expect($response)
         ->toHaveStatusCode(302)
-        ->toHaveHeader('Location', '/dashboard')
+        ->toHaveHeader('Location', '/transactions')
         ->toHaveCookie($this->config()->getSessionCookie());
 });
 
@@ -90,13 +90,13 @@ it('redirects from landing page to login page when user is unauthenticated', fun
         ->toHaveHeader('Location', '/login');
 });
 
-it('redirects from landing page to dashboard page when user is authenticated', function () {
+it('redirects from landing page to transactions page when user is authenticated', function () {
     $this->logIn();
     $request = $this->request(target: '/');
     $response = $this->handle($request);
     expect($response)
         ->toHaveStatusCode(302)
-        ->toHaveHeader('Location', '/dashboard');
+        ->toHaveHeader('Location', '/transactions');
 });
 
 it('displays login page', function () {
@@ -120,7 +120,7 @@ it('authenticates recognized user', function () {
     $response = $this->logIn();
     expect($response)
         ->toHaveStatusCode(302)
-        ->toHaveHeader('Location', '/dashboard');
+        ->toHaveHeader('Location', '/transactions');
 });
 
 it('displays password page', function () {
@@ -131,17 +131,17 @@ it('displays password page', function () {
         ->toHaveHeader('Content-Type', 'text/html');
 });
 
-it('redirects from dashboard page to login page when user is unauthenticated', function () {
-    $request = $this->request(target: '/dashboard');
+it('redirects from transactions page to login page when user is unauthenticated', function () {
+    $request = $this->request(target: '/transactions');
     $response = $this->handle($request);
     expect($response)
         ->toHaveStatusCode(302)
         ->toHaveHeader('Location', '/login');
 });
 
-it('displays dashboard page when user is authenticated', function () {
+it('displays transactions page when user is authenticated', function () {
     $this->logIn();
-    $request = $this->request(target: '/dashboard');
+    $request = $this->request(target: '/transactions');
     $response = $this->handle($request);
     expect($response)
         ->toHaveStatusCode(200)
@@ -150,7 +150,7 @@ it('displays dashboard page when user is authenticated', function () {
 
 it('redirects to login page when JWT token cannot be decoded', function () {
     $cookie = [$this->config()->getSessionCookie() => 'foo'];
-    $request = $this->request(target: '/dashboard', cookie: $cookie);
+    $request = $this->request(target: '/transactions', cookie: $cookie);
     $response = $this->handle($request);
     expect($response)
         ->toHaveStatusCode(302)
@@ -160,7 +160,7 @@ it('redirects to login page when JWT token cannot be decoded', function () {
 
 it('redirects to login page when JWT token is missing subject', function () {
     $this->jwt(['iss' => 'foo']);
-    $request = $this->request(target: '/dashboard');
+    $request = $this->request(target: '/transactions');
     $response = $this->handle($request);
     expect($response)
         ->toHaveStatusCode(302)
@@ -170,7 +170,7 @@ it('redirects to login page when JWT token is missing subject', function () {
 
 it('redirects to login page when JWT token subject is not recognized', function () {
     $this->jwt(['sub' => 'foo']);
-    $request = $this->request(target: '/dashboard');
+    $request = $this->request(target: '/transactions');
     $response = $this->handle($request);
     expect($response)
         ->toHaveStatusCode(302)
@@ -372,5 +372,5 @@ it('resets password successfully', function () {
     $response = $this->logIn($user->withPassword($password));
     expect($response)
         ->toHaveStatusCode(302)
-        ->toHaveHeader('Location', '/dashboard');
+        ->toHaveHeader('Location', '/transactions');
 });

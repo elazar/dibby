@@ -1,7 +1,7 @@
-<?php $this->layout('layout', ['title' => $title]); ?>
+<?php $this->layout('layout', ['title' => 'Log In']); ?>
 
 <div class="container mx-auto text-center">
-  <h2 class="text-xl font-bold mb-6"><?= $this->e($title) ?></h2>
+  <h2 class="text-xl font-bold mb-6">Log In</h2>
 
   <?php if (isset($error)): ?>
   <p class="font-bold mt-6 mb-6"><?= $this->e($error) ?></p>

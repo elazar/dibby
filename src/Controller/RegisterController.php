@@ -29,7 +29,7 @@ class RegisterController
             return $this->responseGenerator->redirect('get_login');
         }
 
-        $data = ['title' => 'Register'];
+        $data = [];
         $status = 200;
 
         if (strcasecmp($request->getMethod(), 'post') === 0) {

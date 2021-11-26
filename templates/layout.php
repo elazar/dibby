@@ -1,3 +1,14 @@
+<?php
+
+$nav = [
+    'get_transactions' => 'Transactions',
+    'get_accounts' => 'Accounts',
+    'get_activity' => 'Activity',
+    'get_users' => 'Users',
+    'get_help' => 'Help',
+];
+
+?>
 <!doctype html>
 <html class="no-js" lang="en">
 <head>
@@ -12,11 +23,9 @@
     <?php if (isset($userName)): ?>
     <nav class="col-span-3">
       <ul class="justify-center items-center space-x-10 flex">
-        <li class="inline"><a href="#" class="font-bold border border-gray-300 bg-gray-200 rounded-md py-1 px-3">Transactions</a></li>
-        <li class="inline"><a href="#" class="hover:bg-gray-200 hover:border-opacity-100 border-opacity-0 border border-gray-300 rounded-md py-1 px-3">Accounts</a></li>
-        <li class="inline"><a href="#" class="hover:bg-gray-200 hover:border-opacity-100 border-opacity-0 border border-gray-300 rounded-md py-1 px-3">Activity</a></li>
-        <li class="inline"><a href="#" class="hover:bg-gray-200 hover:border-opacity-100 border-opacity-0 border border-gray-300 rounded-md py-1 px-3">Users</a></li>
-        <li class="inline"><a href="#" class="hover:bg-gray-200 hover:border-opacity-100 border-opacity-0 border border-gray-300 rounded-md py-1 px-3">Help</a></li>
+        <?php foreach ($nav as $route => $label): ?>
+        <li class="inline"><a href="<?= $this->route($route) ?>" class="rounded-md py-1 px-3 border border-gray-300 <?php if (isset($activeRoute) && $route === $activeRoute): ?>font-bold bg-gray-200<?php else: ?>hover:bg-gray-200 hover:border-opacity-100 border-opacity-0<?php endif; ?>"><?= $this->e($label) ?></a></li>
+        <?php endforeach; ?>
       </ul>
     </nav>
     <div class="flex justify-end">
