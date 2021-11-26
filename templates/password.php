@@ -15,11 +15,11 @@
           <label for="email" class="text-lg">E-mail</label>
         </div>
         <div class="mt-1 block flex">
-          <input type="email" id="email" name="email" class="bg-gray-100 border border-gray-500 rounded-md shadow-md p-2 w-full">
+          <input type="email" id="email" name="email" class="bg-gray-50 border border-gray-500 rounded-md shadow-md p-2 w-full">
         </div>
       </div>
 
-      <button type="submit" class="rounded-md shadow-md border border-gray-500 bg-gray-100 p-2 mt-6 text-lg w-1/6">
+      <button type="submit" class="rounded-md shadow-md border border-gray-500 bg-gray-50 p-2 mt-6 text-lg w-1/6">
         Send Reset E-mail
       </button>
 

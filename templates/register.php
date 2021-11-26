@@ -15,7 +15,7 @@
           <label for="name" class="text-lg">Name</label>
         </div>
         <div class="mt-1 block flex">
-          <input type="text" id="name" name="name" class="bg-gray-100 border border-gray-500 rounded-md shadow-md p-2 w-full">
+          <input type="text" id="name" name="name" class="bg-gray-50 border border-gray-500 rounded-md shadow-md p-2 w-full">
         </div>
       </div>
 
@@ -24,7 +24,7 @@
           <label for="email" class="text-lg">E-mail</label>
         </div>
         <div class="mt-1 block flex">
-          <input type="email" id="email" name="email" class="bg-gray-100 border border-gray-500 rounded-md shadow-md p-2 w-full">
+          <input type="email" id="email" name="email" class="bg-gray-50 border border-gray-500 rounded-md shadow-md p-2 w-full">
         </div>
       </div>
 
@@ -33,11 +33,11 @@
           <label for="password" class="text-lg">Password</label>
         </div>
         <div class="mt-1 block flex">
-          <input type="password" id="password" name="password" class="bg-gray-100 border border-gray-500 rounded-md shadow-md p-2 w-full">
+          <input type="password" id="password" name="password" class="bg-gray-50 border border-gray-500 rounded-md shadow-md p-2 w-full">
         </div>
       </div>
 
-      <button type="submit" class="rounded-md shadow-md border border-gray-500 bg-gray-100 p-2 mt-8 text-lg w-1/6">
+      <button type="submit" class="rounded-md shadow-md border border-gray-500 bg-gray-50 p-2 mt-8 text-lg w-1/6">
         Register
       </button>
     </div>

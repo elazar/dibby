@@ -15,14 +15,16 @@ class DashboardController
 
     public function __invoke(ServerRequestInterface $request): ResponseInterface
     {
-        if ($request->getAttribute('user') === null) {
+        /** @var ?\Elazar\Dibby\User\User $user */
+        $user = $request->getAttribute('user');
+        if ($user === null) {
             return $this->responseGenerator->redirect('get_login');
         }
 
-        return $this->responseGenerator->render(
-            $request,
-            'dashboard',
-            ['title' => 'Dashboard'],
-        );
+        $data = [
+            'title' => 'Dashboard',
+            'userName' => $user->getName(),
+        ];
+        return $this->responseGenerator->render($request, 'dashboard', $data);
     }
 }

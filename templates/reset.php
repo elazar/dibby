@@ -22,11 +22,11 @@
           <label for="password" class="text-lg">New Password</label>
         </div>
         <div class="mt-1 block flex">
-          <input type="password" id="password" name="password" class="bg-gray-100 border border-gray-500 rounded-md shadow-md p-2 w-full">
+          <input type="password" id="password" name="password" class="bg-gray-50 border border-gray-500 rounded-md shadow-md p-2 w-full">
         </div>
       </div>
 
-      <button type="submit" class="rounded-md shadow-md border border-gray-500 bg-gray-100 p-2 mt-8 text-lg w-1/6">
+      <button type="submit" class="rounded-md shadow-md border border-gray-500 bg-gray-50 p-2 mt-8 text-lg w-1/6">
         Reset Password
       </button>
 
