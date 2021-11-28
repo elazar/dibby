@@ -1,8 +1,6 @@
 <?php $this->layout('layout', ['title' => 'Register']); ?>
 
 <div class="container mx-auto text-center">
-  <h2 class="text-xl font-bold mb-6">Register</h2>
-
   <?php if (isset($error)): ?>
   <p class="font-bold mt-6 mb-6"><?= $this->e($error) ?></p>
   <?php endif; ?>

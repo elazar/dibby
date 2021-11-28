@@ -20,7 +20,7 @@ $nav = [
 <body class="m-4 bg-blue-200 text-gray-800 text-lg font-serif">
   <header class="p-2 pl-4 pr-4 mr-4 w-full bg-gray-50 border shadow-md rounded-md grid grid-cols-5 items-center">
     <h1 class="text-2xl font-bold">Dibby</h1>
-    <?php if (isset($userName)): ?>
+    <?php if (isset($user)): ?>
     <nav class="col-span-3 flex place-content-center">
       <ul class="hidden md:flex space-x-2 lg:space-x-10">
         <?php foreach ($nav as $route => $label): ?>
@@ -37,19 +37,34 @@ $nav = [
       </div>
     </nav>
     <div class="flex justify-end">
-      <a href="#" class="hover:bg-gray-200 hover:border-opacity-100 border-opacity-0 border border-gray-300 rounded-md p-1 flex leading-none items-center">
+      <a href="<?= $this->route('edit_user', ['userId' => $user->getId()]) ?>" class="hover:bg-gray-200 hover:border-opacity-100 border-opacity-0 border border-gray-300 rounded-md p-1 flex leading-none items-center">
         <svg xmlns="http://www.w3.org/2000/svg" class="flex h-7 w-7 mr-1" viewBox="0 0 20 20" fill="currentColor" aria-labelledby="user-icon">
           <title id="user-icon">user icon</title>
           <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd" />
         </svg>
-        <?= $this->e($userName) ?>
+        <?= $this->e($user->getName()) ?>
       </a>
     </div>
     <?php endif; ?>
   </header>
   <main class="mt-6 md:mt-8">
-    <h2 class="text-center font-bold font-xl block mb-4 md:hidden md:mb-0"><?= $this->e($title) ?></h2>
+    <h2 class="text-center font-bold font-xl block mb-4"><?= $this->e($title) ?></h2>
     <?= $this->section('content') ?>
   </main>
+  <div id="progress-indicator-modal" class="hidden container h-full w-full place-content-center absolute top-0 left-0 flex">
+    <div class="rounded-md bg-gray-800 text-gray-50 p-4 flex items-center m-auto">
+      <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-labelledby="progress-indicator">
+        <title id="progress-indicator">progress indicator</title>
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      Please wait...
+    </div>
+  </div>
+  <script>
+    window.addEventListener("beforeunload", () => {
+      document.getElementById("progress-indicator-modal").classList.remove("hidden");
+    });
+  </script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 $this->layout('layout', [
     'title' => 'Menu',
     'activeRoute' => 'get_menu',
-    'userName' => $userName,
+    'user' => $user,
 ]);
 
 $link = function (string $route, string $label) {

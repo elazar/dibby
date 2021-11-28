@@ -1,8 +1,6 @@
 <?php $this->layout('layout', ['title' => 'Log In']); ?>
 
 <div class="container mx-auto text-center">
-  <h2 class="text-xl font-bold mb-6">Log In</h2>
-
   <?php if (isset($error)): ?>
   <p class="font-bold mt-6 mb-6"><?= $this->e($error) ?></p>
   <?php endif; ?>
@@ -10,7 +8,7 @@
   <form method="post" action="<?= $this->route('post_login') ?>">
     <div class="flex flex-col items-center">
 
-      <div class="flex flex-col justify-start w-1/3 mb-3">
+      <div class="flex flex-col justify-start w-full md:w-1/3 mb-3">
         <div class="block flex text-left">
           <label for="email" class="text-lg">E-mail</label>
         </div>
@@ -19,7 +17,7 @@
         </div>
       </div>
 
-      <div class="flex flex-col justify-start w-1/3 mt-3 mb-3">
+      <div class="flex flex-col justify-start w-full md:w-1/3 mt-3 mb-3">
         <div class="block flex text-left">
           <label for="password" class="text-lg">Password</label>
         </div>
@@ -28,7 +26,7 @@
         </div>
       </div>
 
-      <button type="submit" class="rounded-md shadow-md border border-gray-500 bg-gray-50 p-2 mt-8 text-lg w-1/6">
+      <button type="submit" class="rounded-md shadow-md border border-gray-500 bg-gray-50 p-2 mt-8 text-lg w-full md:w-1/6">
         Log In
       </button>
 

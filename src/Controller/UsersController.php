@@ -24,7 +24,7 @@ class UsersController
         }
 
         $data = [
-            'userName' => $user->getName(),
+            'user' => $user,
             'users' => $this->userRepository->getUsers(),
         ];
         return $this->responseGenerator->render($request, 'users', $data);

@@ -15,6 +15,7 @@ use Elazar\Dibby\Controller\{
     ResetController,
     TemplatesController,
     TransactionsController,
+    UserController,
     UsersController,
 };
 use League\Route\Router;
@@ -51,6 +52,7 @@ class RouteConfiguration
             ['GET', '/users', UsersController::class, 'get_users'],
             ['GET', '/users/add', UserController::class, 'add_user'],
             ['GET', '/users/{userId}', UserController::class, 'edit_user'],
+            ['POST', '/users', UserController::class, 'post_users'],
             ['GET', '/help', HelpController::class, 'get_help'],
             ['GET', '/menu', MenuController::class, 'get_menu'],
         ];

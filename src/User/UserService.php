@@ -7,9 +7,6 @@ use DateTimeImmutable;
 use Elazar\Dibby\{
     Email\EmailService,
     Exception,
-    User\PasswordHasher,
-    User\ResetTokenGenerator,
-    User\UserRepository,
 };
 use Psr\Log\LoggerInterface;
 
@@ -17,6 +14,7 @@ class UserService
 {
     public function __construct(
         private UserRepository $userRepository,
+        private PasswordGenerator $passwordGenerator,
         private PasswordHasher $passwordHasher,
         private ResetTokenGenerator $resetTokenGenerator,
         private EmailService $emailService,
@@ -34,9 +32,13 @@ class UserService
             throw Exception::invalidInput('E-mail is invalid');
         }
         if (empty($user->getPassword())) {
-            throw Exception::invalidInput('Password is required');
+            $user = $user->withPassword(
+                $this->passwordGenerator->getPassword($user),
+            );
         }
-        $passwordHash = $this->passwordHasher->getHash($user->getPassword());
+        /** @var string */
+        $password = $user->getPassword();
+        $passwordHash = $this->passwordHasher->getHash($password);
         $user = $user->withPasswordHash($passwordHash);
         return $this->userRepository->persistUser($user);
     }

@@ -22,7 +22,7 @@ class HelpController
         }
 
         $data = [
-            'userName' => $user->getName(),
+            'user' => $user,
         ];
         return $this->responseGenerator->render($request, 'help', $data);
     }

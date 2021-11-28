@@ -30,6 +30,7 @@ use Elazar\Dibby\Controller\{
     ResponseGenerator,
     TemplatesController,
     TransactionsController,
+    UserController,
     UsersController,
 };
 
@@ -62,9 +63,11 @@ use Elazar\Dibby\Template\{
 };
 
 use Elazar\Dibby\User\{
+    DefaultPasswordGenerator,
     DefaultPasswordHasher,
     DefaultResetTokenGenerator,
     DoctrineUserRepository,
+    PasswordGenerator,
     PasswordHasher,
     ResetTokenGenerator,
     UserRepository,
@@ -266,6 +269,8 @@ class PimpleServiceProvider implements ServiceProviderInterface
         );
 
         // Users
+        $pimple[DefaultPasswordGenerator::class] = fn() => new DefaultPasswordGenerator;
+        $pimple[PasswordGenerator::class] = fn($c) => $c[DefaultPasswordGenerator::class];
         $pimple[DefaultPasswordHasher::class] = fn() => new DefaultPasswordHasher;
         $pimple[PasswordHasher::class] = fn($c) => $c[DefaultPasswordHasher::class];
         $pimple[DefaultResetTokenGenerator::class] = fn() => new DefaultResetTokenGenerator;
@@ -277,6 +282,7 @@ class PimpleServiceProvider implements ServiceProviderInterface
         $pimple[UserRepository::class] = fn($c) => $c[DoctrineUserRepository::class];
         $pimple[UserService::class] = fn($c) => new UserService(
             $c[UserRepository::class],
+            $c[PasswordGenerator::class],
             $c[PasswordHasher::class],
             $c[ResetTokenGenerator::class],
             $c[EmailService::class],
@@ -338,6 +344,11 @@ class PimpleServiceProvider implements ServiceProviderInterface
         );
         $pimple[MenuController::class] = fn($c) => new MenuController(
             $c[ResponseGenerator::class],
+        );
+        $pimple[UserController::class] = fn($c) => new UserController(
+            $c[ResponseGenerator::class],
+            $c[UserRepository::class],
+            $c[UserService::class],
         );
     }
 }

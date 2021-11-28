@@ -22,7 +22,7 @@ class TemplatesController
         }
 
         $data = [
-            'userName' => $user->getName(),
+            'user' => $user,
         ];
         return $this->responseGenerator->render($request, 'templates', $data);
     }

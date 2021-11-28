@@ -22,7 +22,7 @@ class AccountsController
         }
 
         $data = [
-            'userName' => $user->getName(),
+            'user' => $user,
         ];
         return $this->responseGenerator->render($request, 'accounts', $data);
     }
