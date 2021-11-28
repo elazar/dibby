@@ -36,6 +36,41 @@ class DoctrineUserRepository implements UserRepository
         return $user;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getUsers(): array
+    {
+        $connection = $this->connectionFactory->getReadConnection();
+        $table = $connection->quoteIdentifier(self::TABLE);
+        try {
+            $results = $connection->executeQuery(
+                <<<EOS
+                SELECT
+                    *
+                FROM
+                    $table
+                ORDER BY
+                    name
+                EOS
+            );
+            /** @var User[] */
+            $users = [];
+            while (
+                /** @var array<string, string> $row */
+                $row = $results->fetchAssociative()
+            ) {
+                $users[] = User::fromArray($row);
+            }
+            return $users;
+        } catch (Throwable $error) {
+            $this->logger->warning('Error fetching users', [
+                'error' => $error,
+            ]);
+            throw $error;
+        }
+    }
+
     public function getUserById(string $userId): User
     {
         return $this->getUserBy('id', $userId);

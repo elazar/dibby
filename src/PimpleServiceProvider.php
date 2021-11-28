@@ -18,14 +18,17 @@ use Elazar\Dibby\Configuration\{
 
 use Elazar\Dibby\Controller\{
     AccountsController,
+    AddTransactionController,
     ActivityController,
     HelpController,
     IndexController,
     LoginController,
+    MenuController,
     PasswordController,
     RegisterController,
     ResetController,
     ResponseGenerator,
+    TemplatesController,
     TransactionsController,
     UsersController,
 };
@@ -319,11 +322,21 @@ class PimpleServiceProvider implements ServiceProviderInterface
         );
         $pimple[UsersController::class] = fn($c) => new UsersController(
             $c[ResponseGenerator::class],
+            $c[UserRepository::class],
         );
         $pimple[HelpController::class] = fn($c) => new HelpController(
             $c[ResponseGenerator::class],
         );
         $pimple[TransactionsController::class] = fn($c) => new TransactionsController(
+            $c[ResponseGenerator::class],
+        );
+        $pimple[TemplatesController::class] = fn($c) => new TemplatesController(
+            $c[ResponseGenerator::class],
+        );
+        $pimple[AddTransactionController::class] = fn($c) => new AddTransactionController(
+            $c[ResponseGenerator::class],
+        );
+        $pimple[MenuController::class] = fn($c) => new MenuController(
             $c[ResponseGenerator::class],
         );
     }

@@ -22,8 +22,6 @@ class ActivityController
         }
 
         $data = [
-            'title' => 'Activity',
-            'activeRoute' => 'get_activity',
             'userName' => $user->getName(),
         ];
         return $this->responseGenerator->render($request, 'activity', $data);

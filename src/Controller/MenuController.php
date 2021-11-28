@@ -2,17 +2,15 @@
 
 namespace Elazar\Dibby\Controller;
 
-use Elazar\Dibby\User\UserRepository;
 use Psr\Http\Message\{
     ResponseInterface,
     ServerRequestInterface,
 };
 
-class UsersController
+class MenuController
 {
     public function __construct(
         private ResponseGenerator $responseGenerator,
-        private UserRepository $userRepository,
     ) { }
 
     public function __invoke(ServerRequestInterface $request): ResponseInterface
@@ -25,8 +23,7 @@ class UsersController
 
         $data = [
             'userName' => $user->getName(),
-            'users' => $this->userRepository->getUsers(),
         ];
-        return $this->responseGenerator->render($request, 'users', $data);
+        return $this->responseGenerator->render($request, 'menu', $data);
     }
 }

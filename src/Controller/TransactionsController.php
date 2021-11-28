@@ -23,6 +23,7 @@ class TransactionsController
 
         $data = [
             'userName' => $user->getName(),
+            'transactions' => [],
         ];
         return $this->responseGenerator->render($request, 'transactions', $data);
     }

@@ -22,8 +22,6 @@ class AccountsController
         }
 
         $data = [
-            'title' => 'Accounts',
-            'activeRoute' => 'get_accounts',
             'userName' => $user->getName(),
         ];
         return $this->responseGenerator->render($request, 'accounts', $data);

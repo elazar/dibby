@@ -31,7 +31,7 @@ class PlatesRouteExtension implements ExtensionInterface
         $engine->registerFunction(
             'route',
             /** @phpstan-ignore-next-line */
-            fn(string $name): string => $this->routes->getPath($name),
+            fn(string $name, ?array $parameters = null): string => $this->routes->getPath($name, $parameters),
         );
     }
 }

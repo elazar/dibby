@@ -18,6 +18,11 @@ interface UserRepository
     public function persistUser(User $user): User;
 
     /**
+     * @return User[]
+     */
+    public function getUsers(): array;
+
+    /**
      * @throws \Elazar\Dibby\Exception if user cannot be retrieved
      */
     public function getUserById(string $userId): User;

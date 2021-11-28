@@ -22,8 +22,6 @@ class HelpController
         }
 
         $data = [
-            'title' => 'Help',
-            'activeRoute' => 'get_help',
             'userName' => $user->getName(),
         ];
         return $this->responseGenerator->render($request, 'help', $data);

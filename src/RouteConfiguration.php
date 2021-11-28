@@ -4,13 +4,16 @@ namespace Elazar\Dibby;
 
 use Elazar\Dibby\Controller\{
     AccountsController,
+    AddTransactionController,
     ActivityController,
     HelpController,
     IndexController,
     LoginController,
+    MenuController,
     PasswordController,
     RegisterController,
     ResetController,
+    TemplatesController,
     TransactionsController,
     UsersController,
 };
@@ -41,14 +44,22 @@ class RouteConfiguration
             ['GET', '/register', RegisterController::class, 'get_register'],
             ['POST', '/register', RegisterController::class, 'post_register'],
             ['GET', '/transactions', TransactionsController::class, 'get_transactions'],
+            ['GET', '/transactions/add', AddTransactionController::class, 'get_transaction'],
+            ['GET', '/transactions/templates', TemplatesController::class, 'get_templates'],
             ['GET', '/accounts', AccountsController::class, 'get_accounts'],
             ['GET', '/activity', ActivityController::class, 'get_activity'],
             ['GET', '/users', UsersController::class, 'get_users'],
+            ['GET', '/users/add', UserController::class, 'add_user'],
+            ['GET', '/users/{userId}', UserController::class, 'edit_user'],
             ['GET', '/help', HelpController::class, 'get_help'],
+            ['GET', '/menu', MenuController::class, 'get_menu'],
         ];
     }
 
-    public function getPath(string $name): string
+    /**
+     * @param array<string, string>|null $parameters
+     */
+    public function getPath(string $name, ?array $parameters = null): string
     {
         if ($this->namePathMap === null) {
             foreach ($this->routes as $route) {
@@ -61,7 +72,13 @@ class RouteConfiguration
             throw Exception::routeNotFound($name);
         }
 
-        return $this->namePathMap[$name];
+        $path = $this->namePathMap[$name];
+        if (!empty($parameters)) {
+            foreach ($parameters as $parameter => $value) {
+                $path = str_replace('{' . $parameter . '}', $value, $path);
+            }
+        }
+        return $path;
     }
 
     public function apply(Router $router): Router
