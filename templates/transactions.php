@@ -23,7 +23,8 @@ $nav = [
     </ul>
   </nav>
   <?php if (count($transactions) === 0): ?>
-  <p>Looks like you don't have any transactions yet. Would you like to <a href="<?= $this->route('get_transaction') ?>" class="font-bold p-1 border-dashed border-0 border-b-2 border-gray-500">add some</a>?</p>
+  <p>Looks like you don't have any transactions yet.</p>
+  <p class="mt-5">Would you like to <a href="<?= $this->route('get_transaction') ?>" class="font-bold p-1 border-dashed border-0 border-b-2 border-gray-500">add some</a>?</p>
   <?php else: ?>
   <?php endif; ?>
 </div>
