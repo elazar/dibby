@@ -19,7 +19,7 @@ use Elazar\Dibby\Configuration\{
     Configuration,
     ConfigurationFactory,
     EnvConfigurationFactory,
-    PhpConfigurationFactory,
+    PhpFileConfigurationFactory,
 };
 
 use Elazar\Dibby\Controller\{
@@ -237,8 +237,8 @@ class PimpleServiceProvider implements ServiceProviderInterface
 
         // Configuration
         $pimple[EnvConfigurationFactory::class] = new EnvConfigurationFactory;
-        $pimple[PhpConfigurationFactory::class] = new PhpConfigurationFactory;
-        $pimple[ConfigurationFactory::class] = $pimple[PhpConfigurationFactory::class];
+        $pimple[PhpFileConfigurationFactory::class] = new PhpFileConfigurationFactory;
+        $pimple[ConfigurationFactory::class] = $pimple[PhpFileConfigurationFactory::class];
         $pimple[Configuration::class] = fn($c) => $c[ConfigurationFactory::class]->getConfiguration();
 
         // Doctrine
