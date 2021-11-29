@@ -9,6 +9,12 @@ use Doctrine\DBAL\{
     Logging\SQLLogger,
 };
 
+use Elazar\Dibby\Account\{
+    AccountRepository,
+    AccountService,
+    DoctrineAccountRepository,
+};
+
 use Elazar\Dibby\Configuration\{
     Configuration,
     ConfigurationFactory,
@@ -18,7 +24,6 @@ use Elazar\Dibby\Configuration\{
 
 use Elazar\Dibby\Controller\{
     AccountsController,
-    AddTransactionController,
     ActivityController,
     HelpController,
     IndexController,
@@ -29,6 +34,7 @@ use Elazar\Dibby\Controller\{
     ResetController,
     ResponseGenerator,
     TemplatesController,
+    TransactionController,
     TransactionsController,
     UserController,
     UsersController,
@@ -291,6 +297,14 @@ class PimpleServiceProvider implements ServiceProviderInterface
             $c[Configuration::class]->getResetTokenTimeToLive(),
         );
 
+        // Accounts
+        $pimple[DoctrineAccountRepository::class] = fn($c) => new DoctrineAccountRepository(
+            $c[DoctrineConnectionFactory::class],
+            $c[LoggerInterface::class],
+        );
+        $pimple[AccountRepository::class] = fn($c) => $c[DoctrineAccountRepository::class];
+        $pimple[AccountService::class] = fn($c) => new AccountService($c[AccountRepository::class]);
+
         // Controllers
         $pimple[IndexController::class] = fn($c) => new IndexController(
             $c[ResponseGenerator::class],
@@ -339,7 +353,7 @@ class PimpleServiceProvider implements ServiceProviderInterface
         $pimple[TemplatesController::class] = fn($c) => new TemplatesController(
             $c[ResponseGenerator::class],
         );
-        $pimple[AddTransactionController::class] = fn($c) => new AddTransactionController(
+        $pimple[TransactionController::class] = fn($c) => new TransactionController(
             $c[ResponseGenerator::class],
         );
         $pimple[MenuController::class] = fn($c) => new MenuController(

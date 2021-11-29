@@ -2,8 +2,10 @@
 
 namespace Elazar\Dibby\User;
 
-use Elazar\Dibby\Database\DoctrineConnectionFactory;
-use Elazar\Dibby\Exception;
+use Elazar\Dibby\{
+    Database\DoctrineConnectionFactory,
+    Exception,
+};
 use Psr\Log\LoggerInterface;
 use Ramsey\Uuid\Uuid;
 use Throwable;
@@ -19,6 +21,11 @@ class DoctrineUserRepository implements UserRepository
 
     public function persistUser(User $user): User
     {
+        $existing = $this->getUserByEmail($user->getEmail());
+        if ($existing->getId() !== $user->getId()) {
+            throw Exception::userExists($user->getEmail());
+        }
+
         if ($user->getId() === null) {
             $method = 'insert';
             $user = $user->withId(Uuid::uuid4());
@@ -28,12 +35,20 @@ class DoctrineUserRepository implements UserRepository
             $args = [['id' => $user->getId()]];
         }
 
-        $connection = $this->connectionFactory->getWriteConnection();
-        $table = $connection->quoteIdentifier(self::TABLE);
-        $data = $user->toArray();
-        $connection->$method($table, $data, ...$args);
-
-        return $user;
+        try {
+            $connection = $this->connectionFactory->getWriteConnection();
+            $table = $connection->quoteIdentifier(self::TABLE);
+            $data = $user->toArray();
+            $connection->$method($table, $data, ...$args);
+            return $user;
+        } catch (Throwable $error) {
+            $this->logger->error('Error persisting user', [
+                'user_id' => $user->getId(),
+                'user_email' => $user->getEmail(),
+                'error' => $error,
+            ]);
+            throw $error;
+        }
     }
 
     /**
@@ -83,10 +98,10 @@ class DoctrineUserRepository implements UserRepository
 
     private function getUserBy(string $field, string $value): User
     {
-        $connection = $this->connectionFactory->getReadConnection();
-        $table = $connection->quoteIdentifier(self::TABLE);
-        $column = $connection->quoteIdentifier($field);
         try {
+            $connection = $this->connectionFactory->getReadConnection();
+            $table = $connection->quoteIdentifier(self::TABLE);
+            $column = $connection->quoteIdentifier($field);
             /** @var string[]|false */
             $data = $connection->fetchAssociative(
                 <<<EOS

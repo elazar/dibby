@@ -4,7 +4,6 @@ namespace Elazar\Dibby;
 
 use Elazar\Dibby\Controller\{
     AccountsController,
-    AddTransactionController,
     ActivityController,
     HelpController,
     IndexController,
@@ -14,6 +13,7 @@ use Elazar\Dibby\Controller\{
     RegisterController,
     ResetController,
     TemplatesController,
+    TransactionController,
     TransactionsController,
     UserController,
     UsersController,
@@ -45,7 +45,8 @@ class RouteConfiguration
             ['GET', '/register', RegisterController::class, 'get_register'],
             ['POST', '/register', RegisterController::class, 'post_register'],
             ['GET', '/transactions', TransactionsController::class, 'get_transactions'],
-            ['GET', '/transactions/add', AddTransactionController::class, 'get_transaction'],
+            ['POST', '/transactions', TransactionsController::class, 'post_transactions'],
+            ['GET', '/transactions/add', TransactionController::class, 'get_transaction'],
             ['GET', '/transactions/templates', TemplatesController::class, 'get_templates'],
             ['GET', '/accounts', AccountsController::class, 'get_accounts'],
             ['GET', '/activity', ActivityController::class, 'get_activity'],

@@ -63,8 +63,8 @@ $nav = [
   </div>
   <script>
     window.addEventListener("beforeunload", () => {
-      document.getElementById("progress-indicator-modal").classList.remove("hidden");
-    });
+      document.getElementById("progress-indicator-modal").classList.remove("hidden")
+    })
   </script>
 </body>
 </html>

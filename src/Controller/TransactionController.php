@@ -7,7 +7,7 @@ use Psr\Http\Message\{
     ServerRequestInterface,
 };
 
-class AddTransactionController
+class TransactionController
 {
     public function __construct(
         private ResponseGenerator $responseGenerator,
@@ -24,6 +24,6 @@ class AddTransactionController
         $data = [
             'user' => $user,
         ];
-        return $this->responseGenerator->render($request, 'accounts', $data);
+        return $this->responseGenerator->render($request, 'transaction', $data);
     }
 }
