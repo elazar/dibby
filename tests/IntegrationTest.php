@@ -374,3 +374,13 @@ it('resets password successfully', function () {
         ->toHaveStatusCode(302)
         ->toHaveHeader('Location', '/transactions');
 });
+
+it('lists the registered user on the users page', function () {
+    $user = $this->addUser();
+    $this->logIn($user);
+    $request = $this->request(target: '/users');
+    $response = $this->handle($request);
+    expect($response)
+        ->toHaveStatusCode(200)
+        ->toHaveBodyMatching('td:contains(' . $user->getName() . ')');
+});

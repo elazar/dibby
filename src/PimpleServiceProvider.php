@@ -68,6 +68,12 @@ use Elazar\Dibby\Template\{
     TemplateEngine,
 };
 
+use Elazar\Dibby\Transaction\{
+    DoctrineTransactionRepository,
+    TransactionRepository,
+    TransactionService,
+};
+
 use Elazar\Dibby\User\{
     DefaultPasswordGenerator,
     DefaultPasswordHasher,
@@ -305,6 +311,16 @@ class PimpleServiceProvider implements ServiceProviderInterface
         $pimple[AccountRepository::class] = fn($c) => $c[DoctrineAccountRepository::class];
         $pimple[AccountService::class] = fn($c) => new AccountService($c[AccountRepository::class]);
 
+        // Transactions
+        $pimple[DoctrineTransactionRepository::class] = fn($c) => new DoctrineTransactionRepository(
+            $c[DoctrineConnectionFactory::class],
+            $c[LoggerInterface::class],
+        );
+        $pimple[TransactionRepository::class] = fn($c) => $c[DoctrineTransactionRepository::class];
+        $pimple[TransactionService::class] = fn($c) => new TransactionService(
+            $c[AccountService::class],
+        );
+
         // Controllers
         $pimple[IndexController::class] = fn($c) => new IndexController(
             $c[ResponseGenerator::class],
@@ -355,6 +371,8 @@ class PimpleServiceProvider implements ServiceProviderInterface
         );
         $pimple[TransactionController::class] = fn($c) => new TransactionController(
             $c[ResponseGenerator::class],
+            $c[AccountRepository::class],
+            $c[TransactionService::class],
         );
         $pimple[MenuController::class] = fn($c) => new MenuController(
             $c[ResponseGenerator::class],
@@ -363,6 +381,7 @@ class PimpleServiceProvider implements ServiceProviderInterface
             $c[ResponseGenerator::class],
             $c[UserRepository::class],
             $c[UserService::class],
+            $c[PasswordGenerator::class],
         );
     }
 }

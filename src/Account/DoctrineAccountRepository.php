@@ -24,35 +24,11 @@ class DoctrineAccountRepository implements AccountRepository
      */
     public function persistAccount(Account $account): Account
     {
-        try {
-            $connection = $this->connectionFactory->getReadConnection();
-            $table = $connection->quoteIdentifier(self::TABLE);
-            /** @var array<string, string> */
-            $data = $connection->fetchAssociative(
-                <<<EOS
-                SELECT
-                    *
-                FROM
-                    $table
-                WHERE
-                    name = ?
-                EOS,
-                [$account->getName()],
-            );
-        } catch (Throwable $error) {
-            $this->logger->error('Error checking for existing account', [
-                'account_id' => $account->getId(),
-                'account_name' => $account->getName(),
-                'error' => $error,
-            ]);
-            throw Exception::databaseUnknownError($error);
-        }
-
-        if (!empty($data)) {
-            $existing = Account::fromArray($data);
-            if ($account->getId() !== $existing->getId()) {
-                throw Exception::accountExists($account->getName());
-            }
+        /** @var string */
+        $accountName = $account->getName();
+        $existing = $this->getAccountByName($accountName);
+        if ($account->getId() !== $existing->getId()) {
+            throw Exception::accountExists($accountName);
         }
 
         if ($account->getId() === null) {
@@ -73,7 +49,7 @@ class DoctrineAccountRepository implements AccountRepository
         } catch (Throwable $error) {
             $this->logger->error('Error persisting account', [
                 'account_id' => $account->getId(),
-                'account_name' => $account->getName(),
+                'account_name' => $accountName,
                 'error' => $error,
             ]);
             throw Exception::databaseUnknownError($error);
@@ -114,5 +90,47 @@ class DoctrineAccountRepository implements AccountRepository
             throw $error;
         }
     }
-}
 
+    public function getAccountById(string $id): Account
+    {
+        $account = $this->getAccountBy('id', $id);
+        if (empty($account->getId())) {
+            throw Exception::accountNotFound($id);
+        }
+        return $account;
+    }
+
+    public function getAccountByName(string $name): Account
+    {
+        return $this->getAccountBy('name', $name)->withName($name);
+    }
+
+    private function getAccountBy(string $field, string $value): Account
+    {
+        try {
+            $connection = $this->connectionFactory->getReadConnection();
+            $column = $connection->quoteIdentifier($field);
+            $table = $connection->quoteIdentifier(self::TABLE);
+            /** @var array<string, string> */
+            $data = $connection->fetchAssociative(
+                <<<EOS
+                SELECT
+                    *
+                FROM
+                    $table
+                WHERE
+                    $column = ?
+                EOS,
+                [$value],
+            );
+        } catch (Throwable $error) {
+            $this->logger->error('Error checking for existing account', [
+                'account_name' => $name,
+                'error' => $error,
+            ]);
+            throw Exception::databaseUnknownError($error);
+        }
+
+        return Account::fromArray($data ?: []);
+    }
+}

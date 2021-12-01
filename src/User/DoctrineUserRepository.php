@@ -21,9 +21,15 @@ class DoctrineUserRepository implements UserRepository
 
     public function persistUser(User $user): User
     {
-        $existing = $this->getUserByEmail($user->getEmail());
-        if ($existing->getId() !== $user->getId()) {
-            throw Exception::userExists($user->getEmail());
+        try {
+            $existing = $this->getUserByEmail($user->getEmail());
+            if ($existing->getId() !== $user->getId()) {
+                throw Exception::userExists($user->getEmail());
+            }
+        } catch (Exception $error) {
+            if ($error->getCode() !== Exception::CODE_USER_NOT_FOUND) {
+                throw $error;
+            }
         }
 
         if ($user->getId() === null) {

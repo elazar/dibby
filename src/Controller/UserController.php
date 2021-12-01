@@ -3,6 +3,7 @@
 namespace Elazar\Dibby\Controller;
 
 use Elazar\Dibby\User\{
+    PasswordGenerator,
     User,
     UserRepository,
     UserService,
@@ -21,6 +22,7 @@ class UserController
         private ResponseGenerator $responseGenerator,
         private UserRepository $userRepository,
         private UserService $userService,
+        private PasswordGenerator $passwordGenerator,
     ) { }
 
     /**
@@ -42,9 +44,13 @@ class UserController
         if (strcasecmp($request->getMethod(), 'post') === 0) {
             $body = (array) $request->getParsedBody();
             try {
-                $user = $this->userService->persistUser(
-                    User::fromArray($body),
-                );
+                $user = User::fromArray($body);
+                if (empty($user->getPassword())) {
+                    $user = $user->withPassword(
+                        $this->passwordGenerator->getPassword($user),
+                    );
+                }
+                $user = $this->userService->persistUser($user);
                 return $this->responseGenerator->redirect('get_users');
             } catch (Throwable $error) {
                 $data += $body;

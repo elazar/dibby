@@ -15,4 +15,13 @@ class AccountService
         }
         return $this->accountRepository->persistAccount($account);
     }
+
+    public function getOrCreateAccountByName(string $name): Account
+    {
+        $account = $this->accountRepository->getAccountByName($name);
+        if (empty($account->getId())) {
+            $account = $this->persistAccount($account);
+        }
+        return $account;
+    }
 }

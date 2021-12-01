@@ -17,6 +17,7 @@ class Exception extends \Exception
     public const CODE_INVALID_INPUT                = 9;
     public const CODE_ACCOUNT_EXISTS               = 10;
     public const CODE_USER_EXISTS                  = 11;
+    public const CODE_ACCOUNT_NOT_FOUND            = 12;
 
     public static function databaseMissingSqlitePath(): self
     {
@@ -107,6 +108,14 @@ class Exception extends \Exception
         return new self(
             'User with e-mail already exists: ' . $email,
             self::CODE_USER_EXISTS,
+        );
+    }
+
+    public static function accountNotFound(string $id): self
+    {
+        return new self(
+            'Account with identifier does not exist: ' . $id,
+            self::CODE_ACCOUNT_NOT_FOUND,
         );
     }
 }

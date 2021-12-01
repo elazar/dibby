@@ -19,4 +19,8 @@ interface AccountRepository
      * @return Account[]
      */
     public function getAccounts(): array;
+
+    public function getAccountById(string $id): Account;
+
+    public function getAccountByName(string $name): Account;
 }

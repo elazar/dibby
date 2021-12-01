@@ -27,17 +27,23 @@ $this->layout('layout', [
       </div>
     </div>
 
+    <datalist id="accounts">
+      <?php foreach ($accounts as $account): ?>
+      <option value="<?= $this->e($account->getName()) ?>">
+      <?php endforeach; ?>
+    </datalist>
+
     <div class="p-3 flex-shrink">
       <label for="debit_account" class="block">Debit Account</label>
       <div class="mt-1">
-        <input id="debit_account" name="debit_account" type="text" class="py-1 px-2 mt-1 border border-gray-500 rounded-md shadow-md" placeholder="e.g. Checking">
+        <input id="debit_account" name="debit_account" list="accounts" type="text" class="py-1 px-2 mt-1 border border-gray-500 rounded-md shadow-md" placeholder="e.g. Checking">
       </div>
     </div>
 
     <div class="p-3 flex-shrink">
       <label for="credit_account" class="block">Credit Account</label>
       <div class="mt-1">
-        <input id="credit_account" name="credit_account" type="text" class="py-1 px-2 mt-1 border border-gray-500 rounded-md shadow-md" placeholder="e.g. Groceries">
+        <input id="credit_account" name="credit_account" list="accounts" type="text" class="py-1 px-2 mt-1 border border-gray-500 rounded-md shadow-md" placeholder="e.g. Groceries">
       </div>
     </div>
 

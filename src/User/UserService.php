@@ -28,13 +28,11 @@ class UserService
         if (empty($user->getName())) {
             throw Exception::invalidInput('Name is required');
         }
+        if (empty($user->getPassword())) {
+            throw Exception::invalidInput('Password is required');
+        }
         if (!filter_var($user->getEmail(), \FILTER_VALIDATE_EMAIL)) {
             throw Exception::invalidInput('E-mail is invalid');
-        }
-        if (empty($user->getPassword())) {
-            $user = $user->withPassword(
-                $this->passwordGenerator->getPassword($user),
-            );
         }
         /** @var string */
         $password = $user->getPassword();

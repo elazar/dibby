@@ -41,6 +41,8 @@ use Psr\Http\{
     Message\ServerRequestInterface,
 };
 
+use Symfony\Component\DomCrawler\Crawler;
+
 /**
  * @return array<string, string>
  */
@@ -77,6 +79,15 @@ expect()->extend('toHaveBodyContaining', function (string $needle) {
     $body = $this->value->getBody();
     $body->rewind();
     expect($body->getContents())->toContain($needle);
+    return $this;
+});
+
+expect()->extend('toHaveBodyMatching', function (string $pattern) {
+    $body = $this->value->getBody();
+    $body->rewind();
+    $crawler = new Crawler($body->getContents());
+    $count = $crawler->filter($pattern)->count();
+    expect($count)->toBeGreaterThan(0);
     return $this;
 });
 
