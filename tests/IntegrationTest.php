@@ -384,3 +384,48 @@ it('lists the registered user on the users page', function () {
         ->toHaveStatusCode(200)
         ->toHaveBodyMatching('td:contains(' . $user->getName() . ')');
 });
+
+it('prevents a user from being added with invalid data', function (array $body, string $error) {
+    $this->logIn();
+    $request = $this->request(
+        target: '/users',
+        method: 'POST',
+        body: $body,
+    );
+    $response = $this->handle($request);
+    expect($response)
+        ->toHaveStatusCode(400)
+        ->toHaveHeader('Content-Type', 'text/html')
+        ->toHaveBodyContaining($error);
+})->with([
+    'missing name' => [
+        [
+            'name' => '',
+            'email' => 'foo@bar.com',
+        ],
+        'Name is required',
+    ],
+    'invalid e-mail' => [
+        [
+            'name' => 'baz',
+            'email' => 'foo',
+        ],
+        'E-mail is invalid',
+    ],
+]);
+
+it('allows the registered user to add another user', function () {
+    $this->logIn();
+    $request = $this->request(
+        target: '/users',
+        method: 'POST',
+        body: [
+            'name' => 'Jane',
+            'email' => 'jane@example.com',
+        ],
+    );
+    $response = $this->handle($request);
+    expect($response)
+        ->toHaveStatusCode(302)
+        ->toHaveHeader('Location', '/users');
+});
