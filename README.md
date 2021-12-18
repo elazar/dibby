@@ -7,17 +7,17 @@ A personal finance manager.
 ### Using Docker
 
 ```bash
-# Install dependencies
-docker-compose run --rm composer install
-
 # Apply default configuration
 cp config.php.dist config.php
 
 # Start containers
 docker-compose up -d
 
+# Install dependencies
+docker-compose exec php composer install
+
 # Run database migrations
-docker-compose run --rm composer run-script migrate
+docker-compose exec php composer run-script migrate
 ```
 
 ### Manual
@@ -39,7 +39,7 @@ cp config.php.dist config.php
 # ...
 
 # Run database migrations
-php ./vendor/bin/doctrine-migrations migrate
+composer run-script migrate
 ```
 
 ## Usage
