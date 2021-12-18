@@ -1,4 +1,4 @@
-version: "3.8"
+version: "3.7"
 
 services:
 
@@ -29,8 +29,9 @@ services:
       - "pgsql:/var/lib/postgresql/data"
 
   mailhog:
-    image: mailhog/mailhog
+    image: cd2team/mailhog
     environment:
+      MH_MAILDIR_PATH: /maildir
       MH_STORAGE: maildir
     ports:
       - "8025:8025"
