@@ -15,14 +15,21 @@ it('redirects from landing page to registration page when no users exist', funct
         ->toHaveHeader('Location', '/register');
 });
 
-it('redirects from registration page to login page when user exists', function () {
+it('redirects unauthenticated user to login page when user exists', function (string $target) {
     $this->addUser();
-    $request = $this->request(target: '/register');
+    $request = $this->request(target: $target);
     $response = $this->handle($request);
     expect($response)
         ->toHaveStatusCode(302)
         ->toHaveHeader('Location', '/login');
-});
+})->with([
+    '/',
+    '/menu',
+    '/register',
+    '/transactions',
+    '/users',
+    '/users/add',
+]);
 
 it('displays error when registering with invalid input', function (array $body, string $error) {
     $request = $this->request(
@@ -80,16 +87,6 @@ it('registers valid user when no users exist', function () {
         ->toHaveCookie($this->config()->getSessionCookie());
 });
 
-it('redirects from landing page to login page when user is unauthenticated', function () {
-    // Create a user to avoid being redirected to the registration page because none exist
-    $this->addUser();
-    $request = $this->request(target: '/');
-    $response = $this->handle($request);
-    expect($response)
-        ->toHaveStatusCode(302)
-        ->toHaveHeader('Location', '/login');
-});
-
 it('redirects from landing page to transactions page when user is authenticated', function () {
     $this->logIn();
     $request = $this->request(target: '/');
@@ -129,14 +126,6 @@ it('displays password page', function () {
     expect($response)
         ->toHaveStatusCode(200)
         ->toHaveHeader('Content-Type', 'text/html');
-});
-
-it('redirects from transactions page to login page when user is unauthenticated', function () {
-    $request = $this->request(target: '/transactions');
-    $response = $this->handle($request);
-    expect($response)
-        ->toHaveStatusCode(302)
-        ->toHaveHeader('Location', '/login');
 });
 
 it('displays transactions page when user is authenticated', function () {
@@ -428,4 +417,26 @@ it('allows the registered user to add another user', function () {
     expect($response)
         ->toHaveStatusCode(302)
         ->toHaveHeader('Location', '/users');
+});
+
+it('displays a form to edit a user', function () {
+    $user = $this->addUser();
+    $this->login($user);
+    $request = $this->request(target: '/users/' . $user->getId());
+    $response = $this->handle($request);
+    expect($response)
+        ->toHaveStatusCode(200)
+        ->toHaveHeader('Content-Type', 'text/html')
+        ->toHaveBodyMatching('input[name=id][value="' . $user->getId() . '"]')
+        ->toHaveBodyMatching('input[name=name][value="' . $user->getName() . '"]')
+        ->toHaveBodyMatching('input[name=email][value="' . $user->getEmail() . '"]');
+});
+
+it('displays menu when user is authenticated', function () {
+    $this->logIn();
+    $request = $this->request(target: '/menu');
+    $response = $this->handle($request);
+    expect($response)
+        ->toHaveStatusCode(200)
+        ->toHaveHeader('Content-Type', 'text/html');
 });
