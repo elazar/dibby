@@ -27,6 +27,7 @@ it('redirects unauthenticated user to login page when user exists', function (st
     '/menu',
     '/register',
     '/transactions',
+    '/transactions/add',
     '/users',
     '/users/add',
 ]);

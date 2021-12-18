@@ -39,4 +39,8 @@ class TransactionService
 
         return $transaction;
     }
+
+    public function persistTransaction(Transaction $transaction): Transaction
+    {
+    }
 }
