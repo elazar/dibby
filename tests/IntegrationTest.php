@@ -113,13 +113,6 @@ it('displays error for unrecognized user on login page', function () {
         ->toHaveBodyContaining('Unrecognized e-mail or password');
 });
 
-it('authenticates recognized user', function () {
-    $response = $this->logIn();
-    expect($response)
-        ->toHaveStatusCode(302)
-        ->toHaveHeader('Location', '/transactions');
-});
-
 it('displays password page', function () {
     $request = $this->request(target: '/password');
     $response = $this->handle($request);
