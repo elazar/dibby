@@ -410,6 +410,12 @@ it('allows the registered user to add another user', function () {
     expect($response)
         ->toHaveStatusCode(302)
         ->toHaveHeader('Location', '/users');
+    $request = $this->request(target: '/users');
+    $response = $this->handle($request);
+    expect($response)
+        ->toHaveStatusCode(200)
+        ->toHaveHeader('Content-Type', 'text/html')
+        ->toHaveBodyMatching('td:contains("Jane")');
 });
 
 it('displays a form to edit a user', function () {
