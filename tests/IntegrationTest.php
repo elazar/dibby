@@ -84,7 +84,7 @@ it('registers valid user when no users exist', function () {
     $response = $this->handle($request);
     expect($response)
         ->toHaveStatusCode(302)
-        ->toHaveHeader('Location', '/transactions')
+        ->toHaveHeader('Location', '/menu')
         ->toHaveCookie($this->config()->getSessionCookie());
 });
 
@@ -355,7 +355,7 @@ it('resets password successfully', function () {
     $response = $this->logIn($user->withPassword($password));
     expect($response)
         ->toHaveStatusCode(302)
-        ->toHaveHeader('Location', '/transactions');
+        ->toHaveHeader('Location', '/menu');
 });
 
 it('lists the registered user on the users page', function () {
