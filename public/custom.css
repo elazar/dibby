@@ -1,0 +1,49 @@
+:root:not([data-theme="dark"]) {
+  --primary: #3949ab;
+  --block-spacing-vertical: var(--spacing);
+}
+
+h1 {
+  --typography-spacing-vertical: 0.75rem;
+}
+
+nav ol.breadcrumb {
+  display: flex;
+  margin: 0;
+}
+
+nav ol.breadcrumb li {
+  display: inline-flex;
+  padding: 0;
+  padding-right: 5px;
+}
+
+nav ol.breadcrumb li:not(:first-child)::before {
+  content: " > ";
+  padding-right: 5px;
+}
+
+nav ul.subnavigation {
+  justify-content: right;
+  margin-left: 0;
+  margin-right: 0;
+  width: 100%;
+}
+
+nav ul.subnavigation li {
+  display: inline-flex;
+  padding-right: 0;
+}
+
+nav ul.subnavigation li:not(:first-child)::before {
+  content: " - ";
+  padding-right: 5px;
+}
+
+.center {
+  text-align: center;
+}
+
+.right {
+  text-align: right;
+}

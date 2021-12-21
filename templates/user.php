@@ -1,49 +1,48 @@
 <?php
 
-$title = (isset($id) ? 'Edit' : 'Add') . ' User';
+if (isset($id)) {
+    $title = 'Edit User';
+    $route = 'edit_user';
+    $routeParams = ['userId' => $id];
+} else {
+    $title = 'Add User';
+    $route = 'add_user';
+    $routeParams = null;
+}
 
-$this->layout('layout', [
-  'user' => $user,
-  'activeRoute' => 'get_users',
-  'title' => $title,
-]);
+$this->layout('layout');
 
 ?>
 
-<div class="container mx-auto text-center">
-  <?php if (isset($error)): ?>
-  <p class="font-bold mt-6 mb-6"><?= $this->e($error) ?></p>
+<nav class="grid">
+  <ol aria-label="breadcrumb" class="breadcrumb">
+    <li><a href="<?= $this->route('get_menu') ?>">Menu</a></li>
+    <li><a href="<?= $this->route($route, $routeParams) ?>" aria-current="page"><?= $title ?></a></li>
+  </ol>
+  <ul aria-label="subnavigation" class="subnavigation">
+    <li><a href="<?= $this->route('get_users') ?>">List Users</a></li>
+    <?php if (isset($id)): ?>
+    <li><a href="<?= $this->route('add_user') ?>">Add User</a></li>
+    <?php endif; ?>
+  </ul>
+</nav>
+
+<h1 class="center"><?= $title ?></h1>
+
+<?php if (isset($error)): ?>
+<p><strong><?= $this->e($error) ?></strong></p>
+<?php endif; ?>
+
+<form method="post" action="<?= $this->route('post_users') ?>">
+  <?php if (isset($id)): ?>
+  <input type="hidden" name="id" value="<?= $this->e($id) ?>">
   <?php endif; ?>
 
-  <form method="post" action="<?= $this->route('post_users') ?>">
-    <?php if (isset($id)): ?>
-    <input type="hidden" name="id" value="<?= $this->e($id) ?>">
-    <?php endif; ?>
+  <label for="name">Name</label>
+  <input type="text" id="name" name="name" value="<?= $this->e($name ?? '') ?>" required autofocus>
 
-    <div class="flex flex-col items-center">
+  <label for="email">E-mail</label>
+  <input type="email" id="email" name="email" value="<?= $this->e($email ?? '') ?>" required>
 
-      <div class="flex flex-col justify-start w-full md:w-1/3 w-1/3 mb-3">
-        <div class="block flex text-left">
-          <label for="name" class="text-lg">Name</label>
-        </div>
-        <div class="mt-1 block flex">
-          <input type="text" id="name" name="name" class="bg-gray-50 border border-gray-500 rounded-md shadow-md p-2 w-full" value="<?= $this->e($name ?? '') ?>">
-        </div>
-      </div>
-
-      <div class="flex flex-col justify-start w-full md:w-1/3 w-1/3 mb-3">
-        <div class="block flex text-left">
-          <label for="email" class="text-lg">E-mail</label>
-        </div>
-        <div class="mt-1 block flex">
-          <input type="email" id="email" name="email" class="bg-gray-50 border border-gray-500 rounded-md shadow-md p-2 w-full" value="<?= $this->e($email ?? '') ?>">
-        </div>
-      </div>
-
-      <button type="submit" class="rounded-md shadow-md border border-gray-500 bg-gray-50 p-2 mt-8 text-lg w-full md:w-1/6">
-        <?= (isset($id) ? 'Update' : 'Add') . ' User' ?>
-      </button>
-
-    </div>
-  </form>
-</div>
+  <button type="submit"><?= isset($id) ? 'Update' : 'Add' ?> User</button>
+</form>

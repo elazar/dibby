@@ -1,18 +1,25 @@
 <?php
 
-$this->layout('layout', [
-    'title' => 'Transactions',
-    'activeRoute' => 'get_transactions',
-    'user' => $user,
-]);
+$this->layout('layout');
 
 ?>
 
-<div class="container mx-auto text-center">
-  <?php $this->insert('transactions-nav', ['activeRoute' => 'get_transactions']) ?>
-  <?php if (count($transactions) === 0): ?>
+<nav class="grid">
+  <ol aria-label="breadcrumb" class="breadcrumb">
+    <li><a href="<?= $this->route('get_menu') ?>">Menu</a></li>
+    <li><a href="<?= $this->route('get_transactions') ?>" aria-current="page">List Transactions</a></li>
+  </ol>
+  <ul aria-label="subnavigation" class="subnavigation">
+    <li><a href="<?= $this->route('get_transaction') ?>">Add Transaction</a></li>
+  </ul>
+</nav>
+
+<h1 class="center">Transactions</h1>
+
+<?php if (count($transactions) === 0): ?>
+<div class="center">
   <p>Looks like you don't have any transactions yet.</p>
-  <p class="mt-5">Want to <a href="<?= $this->route('get_transaction') ?>" class="font-bold p-1 border-dashed border-0 border-b-2 border-gray-500">add some</a>?</p>
-  <?php else: ?>
-  <?php endif; ?>
+  <p>Want to <a href="<?= $this->route('get_transaction') ?>">add some</a>?</p>
 </div>
+<?php else: ?>
+<?php endif; ?>

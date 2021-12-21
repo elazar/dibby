@@ -1,29 +1,32 @@
 <?php
 
-$this->layout('layout', [
-    'title' => 'Users',
-    'activeRoute' => 'get_users',
-    'user' => $user,
-]);
+$this->layout('layout');
 
 ?>
 
-<div class="container mx-auto text-center">
-  <nav class="hidden md:flex justify-center items-center">
-    <ul class="space-x-10 flex mb-10">
-      <li class="inline"><a href="<?= $this->route('add_user') ?>" class="rounded-md py-1 px-3 border border-gray-800 hover:bg-gray-50 hover:border-opacity-100 border-opacity-0">Add User</a></li>
-    </ul>
-  </nav>
-  <table class="text-left bg-gray-50 w-3/4 md:w-1/4 mx-auto">
-    <tr class="border border-gray-800 bg-gray-300">
-      <th class="p-2">Name</th>
-      <th class="p-2"></th>
+<nav class="grid">
+  <ol aria-label="breadcrumb" class="breadcrumb">
+    <li><a href="<?= $this->route('get_menu') ?>">Menu</a></li>
+    <li><a href="<?= $this->route('get_users') ?>" aria-current="page">List Users</a></li>
+  </ol>
+  <ul aria-label="subnavigation" class="subnavigation">
+    <li><a href="<?= $this->route('add_user') ?>">Add User</a></li>
+  </ul>
+</nav>
+
+<h1 class="center">List Users</h1>
+
+<table role="grid">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th></th>
     </tr>
-    <?php foreach ($users as $user): ?>
-    <tr class="border border-gray-800">
-      <td class="p-2"><?= $this->e($user->getName()) ?></td>
-      <td class="p-2 text-right"><a href="<?= $this->route('edit_user', ['userId' => $user->getId()]) ?>" class="p-1 border-dashed border-0 border-b-2 border-gray-500">Edit</a></td>
-    </tr>
-    <?php endforeach; ?>
-  </table>
-</div>
+  </thead>
+  <?php foreach ($users as $user): ?>
+  <tr>
+    <td><?= $this->e($user->getName()) ?></td>
+    <td class="right"><a href="<?= $this->route('edit_user', ['userId' => $user->getId()]) ?>">Edit</a></td>
+  </tr>
+  <?php endforeach; ?>
+</table>
