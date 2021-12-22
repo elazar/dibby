@@ -190,6 +190,7 @@ class PimpleServiceProvider implements ServiceProviderInterface
             $c[DateTimeImmutable::class],
             $c[Configuration::class]->getSessionCookie(),
             $c[Configuration::class]->getSessionTimeToLive(),
+            $c[Configuration::class]->getSessionSecure(),
         );
 
         // PSR-15 request handler implementation

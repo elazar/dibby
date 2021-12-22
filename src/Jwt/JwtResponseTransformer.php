@@ -12,6 +12,7 @@ class JwtResponseTransformer
         private DateTimeImmutable $now,
         private string $sessionCookie,
         private string $sessionTimeToLive,
+        private bool $sessionSecure,
     ) { }
 
     public function transform(
@@ -29,13 +30,16 @@ class JwtResponseTransformer
     {
         $interval = new DateInterval($this->sessionTimeToLive);
         $expires = $this->now->add($interval)->format(DateTimeImmutable::RFC7231);
-        return implode('; ', [
+        $segments = [
             $this->sessionCookie . '=' . $jwt,
             'Expires=' . $expires,
             'Path=/',
             'SameSite=Strict',
-            'Secure',
             'HttpOnly',
-        ]);
+        ];
+        if ($this->sessionSecure) {
+            $segments[] = 'Secure';
+        }
+        return implode('; ', $segments);
     }
 }

@@ -28,6 +28,7 @@ class PhpArrayConfigurationFactory implements ConfigurationFactory
             $this->settings['session']['key'],
             $this->settings['session']['cookie'],
             $this->settings['session']['ttl'],
+            $this->settings['session']['secure'],
             $this->settings['reset_token_ttl'],
             $this->settings['smtp']['host'],
             $this->settings['smtp']['port'],

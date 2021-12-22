@@ -34,6 +34,7 @@ class EnvConfigurationFactory implements ConfigurationFactory
             $this->getEnv('SESSION_KEY'),
             $this->getEnv('SESSION_COOKIE'),
             $this->getEnv('SESSION_TTL'),
+            (bool) $this->getEnv('SESSION_SECURE'),
             $this->getEnv('RESET_TOKEN_TTL'),
             $this->getEnv('SMTP_HOST'),
             (int) $this->getEnv('SMTP_PORT'),

@@ -32,6 +32,7 @@ return [
         'key' => 'ChangeMe',
         'cookie' => 'token',
         'ttl' => 'PT30M',
+        'secure' => true,
     ],
 
     'smtp' => [

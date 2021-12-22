@@ -14,6 +14,7 @@ class Configuration
         private string $sessionKey,
         private string $sessionCookie,
         private string $sessionTimeToLive,
+        private bool $sessionSecure,
         private string $resetTokenTimeToLive,
         private string $smtpHost,
         private int $smtpPort,
@@ -52,6 +53,11 @@ class Configuration
     public function getSessionTimeToLive(): string
     {
         return $this->sessionTimeToLive;
+    }
+
+    public function getSessionSecure(): bool
+    {
+        return $this->sessionSecure;
     }
 
     public function getResetTokenTimeToLive(): string
