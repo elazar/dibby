@@ -42,6 +42,14 @@ cp config.php.dist config.php
 composer run-script migrate
 ```
 
+> **NOTE**: If you're using a virtual host configured without SSL, be sure to
+> disable the configuration setting to secure the session.
+>
+> For environmental variable configuration: set `DIBBY_SESSION_SECURE` to an empty string.
+> For PHP file configuration: set `$config['session']['secure']` to `false`.
+
 ## Usage
 
-Assuming you've performed the installation using Docker, navigate to [http://localhost:8080](http://localhost:8080) to continue. Otherwise, navigate to the appropriate host and port for your hosting setup.
+Assuming you've performed the installation using Docker, navigate to
+[http://localhost:8080](http://localhost:8080) to continue. Otherwise, navigate
+to the appropriate host and port for your hosting setup.
