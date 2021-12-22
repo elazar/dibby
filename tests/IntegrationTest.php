@@ -88,13 +88,13 @@ it('registers valid user when no users exist', function () {
         ->toHaveCookie($this->config()->getSessionCookie());
 });
 
-it('redirects from landing page to transactions page when user is authenticated', function () {
+it('redirects from landing page to menu page when user is authenticated', function () {
     $this->logIn();
     $request = $this->request(target: '/');
     $response = $this->handle($request);
     expect($response)
         ->toHaveStatusCode(302)
-        ->toHaveHeader('Location', '/transactions');
+        ->toHaveHeader('Location', '/menu');
 });
 
 it('displays login page', function () {
