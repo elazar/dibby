@@ -22,6 +22,7 @@
   document.getElementById("login_form").addEventListener("submit", () => {
     const button = document.getElementById("login_button")
     button.innerText = "Logging in..."
+    button.disabled = true
     if (button.ariaBusy !== undefined) {
       button.ariaBusy = true
     } else {
