@@ -37,7 +37,6 @@ class TransactionController
         }
 
         $data = [
-            'user' => $user,
             'accounts' => $this->accountRepository->getAccounts(),
         ];
         return $this->responseGenerator->render($request, 'transaction', $data);

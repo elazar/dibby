@@ -22,7 +22,6 @@ class ActivityController
         }
 
         $data = [
-            'user' => $user,
         ];
         return $this->responseGenerator->render($request, 'activity', $data);
     }

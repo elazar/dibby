@@ -22,7 +22,6 @@ class TransactionsController
         }
 
         $data = [
-            'user' => $user,
             'transactions' => [],
         ];
         return $this->responseGenerator->render($request, 'transactions', $data);

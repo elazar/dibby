@@ -22,7 +22,6 @@ class AccountsController
         }
 
         $data = [
-            'user' => $user,
         ];
         return $this->responseGenerator->render($request, 'accounts', $data);
     }

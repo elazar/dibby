@@ -22,7 +22,6 @@ class MenuController
         }
 
         $data = [
-            'user' => $user,
         ];
         return $this->responseGenerator->render($request, 'menu', $data);
     }

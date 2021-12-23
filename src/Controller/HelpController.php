@@ -22,7 +22,6 @@ class HelpController
         }
 
         $data = [
-            'user' => $user,
         ];
         return $this->responseGenerator->render($request, 'help', $data);
     }
