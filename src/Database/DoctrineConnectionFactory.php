@@ -2,9 +2,10 @@
 
 namespace Elazar\Dibby\Database;
 
+use Doctrine\DBAL\Configuration as DoctrineConfiguration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
-use Doctrine\DBAL\Logging\SQLLogger;
+use Doctrine\DBAL\Logging\Middleware;
 use Elazar\Dibby\Configuration\Configuration;
 use Elazar\Dibby\Exception;
 use Throwable;
@@ -17,7 +18,7 @@ class DoctrineConnectionFactory implements DatabaseConnectionFactory
     public function __construct(
         private DatabaseConfiguration $readConfiguration,
         private DatabaseConfiguration $writeConfiguration,
-        private SQLLogger $sqlLogger,
+        private DoctrineConfiguration $doctrineConfiguration,
     ) { }
 
     /**
@@ -65,8 +66,7 @@ class DoctrineConnectionFactory implements DatabaseConnectionFactory
         ];
 
         try {
-            $connection = DriverManager::getConnection($params);
-            $connection->getConfiguration()->setSQLLogger($this->sqlLogger);
+            $connection = DriverManager::getConnection($params, $this->doctrineConfiguration);
             $connection->connect();
             return $connection;
         } catch (Throwable $error) {

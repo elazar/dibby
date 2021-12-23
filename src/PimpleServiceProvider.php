@@ -5,8 +5,9 @@ namespace Elazar\Dibby;
 use DateTimeImmutable;
 
 use Doctrine\DBAL\{
+    Configuration as DoctrineConfiguration,
     Connection,
-    Logging\SQLLogger,
+    Logging\Middleware as DoctrineLoggingMiddleware,
 };
 
 use Elazar\Dibby\Account\{
@@ -43,7 +44,6 @@ use Elazar\Dibby\Controller\{
 use Elazar\Dibby\Database\{
     DatabaseConnectionFactory,
     DoctrineConnectionFactory,
-    DoctrineSQLLogger,
     Migrations\CliConfig,
 };
 
@@ -249,14 +249,20 @@ class PimpleServiceProvider implements ServiceProviderInterface
         $pimple[Configuration::class] = fn($c) => $c[ConfigurationFactory::class]->getConfiguration();
 
         // Doctrine
-        $pimple[DoctrineSQLLogger::class] = fn($c) => new DoctrineSQLLogger(
+        $pimple[DoctrineLoggingMiddleware::class] = fn($c) => new DoctrineLoggingMiddleware(
             $c[LoggerInterface::class],
         );
-        $pimple[SQLLogger::class] = fn($c) => $c[DoctrineSQLLogger::class];
+        $pimple[DoctrineConfiguration::class] = function ($c) {
+            $configuration = new DoctrineConfiguration;
+            $configuration->setMiddlewares([
+                $c[DoctrineLoggingMiddleware::class],
+            ]);
+            return $configuration;
+        };
         $pimple[DoctrineConnectionFactory::class] = fn($c) => new DoctrineConnectionFactory(
             $c[Configuration::class]->getDatabaseReadConfiguration(),
             $c[Configuration::class]->getDatabaseWriteConfiguration(),
-            $c[SQLLogger::class],
+            $c[DoctrineConfiguration::class],
         );
         $pimple[DatabaseConnectionFactory::class] = fn($c) => $c[DoctrineConnectionFactory::class];
         $pimple[CliConfig::class] = fn($c) => new CliConfig($c[DoctrineConnectionFactory::class]);
