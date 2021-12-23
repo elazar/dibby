@@ -12,15 +12,13 @@ class Transaction
 {
     use Immutable;
 
-    private ?string $id = null;
-
-    private ?string $description = null;
-
     public function __construct(
         private float $amount,
         private Account $debitAccount,
         private Account $creditAccount,
         private DateTimeImmutable $date,
+        private ?string $id = null,
+        private ?string $description = null,
     ) { }
 
     public function getAmount(): float

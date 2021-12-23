@@ -13,7 +13,7 @@ $this->layout('layout');
         <h2>Transactions</h2>
         <ul>
           <li><a href="<?= $this->route('get_transactions') ?>">List Transactions</a></li>
-          <li><a href="<?= $this->route('get_transaction') ?>">Add Transaction</a></li>
+          <li><a href="<?= $this->route('add_transaction') ?>">Add Transaction</a></li>
         </ul>
       </li>
      <li>

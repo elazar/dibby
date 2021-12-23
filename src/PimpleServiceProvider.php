@@ -13,6 +13,7 @@ use Doctrine\DBAL\{
 use Elazar\Dibby\Account\{
     AccountRepository,
     AccountService,
+    CachingAccountRepository,
     DoctrineAccountRepository,
 };
 
@@ -315,17 +316,22 @@ class PimpleServiceProvider implements ServiceProviderInterface
             $c[DoctrineConnectionFactory::class],
             $c[LoggerInterface::class],
         );
-        $pimple[AccountRepository::class] = fn($c) => $c[DoctrineAccountRepository::class];
+        $pimple[AccountRepository::class] = fn($c) => new CachingAccountRepository(
+            $c[DoctrineAccountRepository::class],
+        );
         $pimple[AccountService::class] = fn($c) => new AccountService($c[AccountRepository::class]);
 
         // Transactions
         $pimple[DoctrineTransactionRepository::class] = fn($c) => new DoctrineTransactionRepository(
             $c[DoctrineConnectionFactory::class],
+            $c[AccountRepository::class],
             $c[LoggerInterface::class],
         );
         $pimple[TransactionRepository::class] = fn($c) => $c[DoctrineTransactionRepository::class];
         $pimple[TransactionService::class] = fn($c) => new TransactionService(
             $c[AccountService::class],
+            $c[TransactionRepository::class],
+            $c[LoggerInterface::class],
         );
 
         // Controllers
@@ -371,6 +377,7 @@ class PimpleServiceProvider implements ServiceProviderInterface
             $c[ResponseGenerator::class],
         );
         $pimple[TransactionsController::class] = fn($c) => new TransactionsController(
+            $c[TransactionRepository::class],
             $c[ResponseGenerator::class],
         );
         $pimple[TemplatesController::class] = fn($c) => new TemplatesController(
@@ -380,6 +387,7 @@ class PimpleServiceProvider implements ServiceProviderInterface
             $c[ResponseGenerator::class],
             $c[AccountRepository::class],
             $c[TransactionService::class],
+            $c[TransactionRepository::class],
         );
         $pimple[MenuController::class] = fn($c) => new MenuController(
             $c[ResponseGenerator::class],

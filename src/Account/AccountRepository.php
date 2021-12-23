@@ -22,5 +22,9 @@ interface AccountRepository
 
     public function getAccountById(string $id): Account;
 
+    /**
+     * Should return an Account instance with the given name if no account
+     * exists in the database with that name.
+     */
     public function getAccountByName(string $name): Account;
 }

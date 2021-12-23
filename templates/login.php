@@ -6,7 +6,7 @@
 <p><strong><?= $this->e($error) ?></strong></p>
 <?php endif; ?>
 
-<form id="login_form" method="post" action="<?= $this->route('post_login') ?>">
+<form method="post" action="<?= $this->route('post_login') ?>">
   <label for="email">E-mail</label>
   <input type="email" id="email" name="email" required autofocus>
 
@@ -19,14 +19,5 @@
 <p class="center">Forgot your password? <a href="<?= $this->route('get_password') ?>" tabindex="0">Reset it</a>.</p>
 
 <script>
-  document.getElementById("login_form").addEventListener("submit", () => {
-    const button = document.getElementById("login_button")
-    button.innerText = "Logging in..."
-    button.disabled = true
-    if (button.ariaBusy !== undefined) {
-      button.ariaBusy = true
-    } else {
-      button.setAttribute("aria-busy", true)
-    }
-  })
+  lockButtonOnSubmit("login_button", "Logging In...")
 </script>

@@ -3,8 +3,20 @@
   --block-spacing-vertical: var(--spacing);
 }
 
-h1 {
+h1, h2 {
   --typography-spacing-vertical: 0.75rem;
+}
+
+h2 {
+    --font-size: 1.25rem;
+}
+
+th {
+    --font-weight: bold;
+}
+
+td {
+  vertical-align: top;
 }
 
 nav ol.breadcrumb {

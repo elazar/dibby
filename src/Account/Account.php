@@ -8,10 +8,9 @@ class Account
 {
     use Immutable;
 
-    private ?string $id = null;
-
     public function __construct(
         private string $name,
+        private ?string $id = null,
     ) { }
 
     public function getName(): ?string
@@ -38,7 +37,7 @@ class Account
      */
     public static function fromArray(array $data): self
     {
-        $account = new self((string) $data['name'] ?: '');
+        $account = new self((string) $data['name']);
 
         if (isset($data['id'])) {
             $account = $account->withId((string) $data['id']);

@@ -23,10 +23,12 @@ $this->layout('layout');
       <th></th>
     </tr>
   </thead>
+  <tbody>
   <?php foreach ($users as $user): ?>
-  <tr>
-    <td><?= $this->e($user->getName()) ?></td>
-    <td class="right"><a href="<?= $this->route('edit_user', ['userId' => $user->getId()]) ?>">Edit</a></td>
-  </tr>
+    <tr>
+      <td><?= $this->e($user->getName()) ?></td>
+      <td class="right"><a href="<?= $this->route('edit_user', ['userId' => $user->getId()]) ?>">Edit</a></td>
+    </tr>
   <?php endforeach; ?>
+  </tbody>
 </table>

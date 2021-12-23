@@ -1,6 +1,21 @@
 <?php
 
+use Elazar\Dibby\Transaction\Transaction;
+
 $this->layout('layout');
+
+$transactionsByDate = array_reduce(
+    $transactions,
+    function (array $byDate, Transaction $transaction) {
+        $date = $transaction->getDate()->format('D, M j, Y');
+        if (!isset($byDate[$date])) {
+            $byDate[$date] = [];
+        }
+        $byDate[$date][] = $transaction;
+        return $byDate;
+    },
+    [],
+);
 
 ?>
 
@@ -10,7 +25,7 @@ $this->layout('layout');
     <li><a href="<?= $this->route('get_transactions') ?>" aria-current="page">List Transactions</a></li>
   </ol>
   <ul aria-label="subnavigation" class="subnavigation">
-    <li><a href="<?= $this->route('get_transaction') ?>">Add Transaction</a></li>
+    <li><a href="<?= $this->route('add_transaction') ?>">Add Transaction</a></li>
   </ul>
 </nav>
 
@@ -19,7 +34,20 @@ $this->layout('layout');
 <?php if (count($transactions) === 0): ?>
 <div class="center">
   <p>Looks like you don't have any transactions yet.</p>
-  <p>Want to <a href="<?= $this->route('get_transaction') ?>">add some</a>?</p>
+  <p>Want to <a href="<?= $this->route('add_transaction') ?>">add some</a>?</p>
 </div>
 <?php else: ?>
+  <?php foreach ($transactionsByDate as $date => $transactionsForDate): ?>
+    <section>
+      <h2 class="center"><?= $date ?></h2>
+      <?php foreach ($transactionsForDate as $transaction): ?>
+      <article>
+        <strong><?= number_format($transaction->getAmount(), 2) ?></strong><br>
+        <?= $this->e($transaction->getDebitAccount()->getName()) ?> &rarr; <?= $this->e($transaction->getCreditAccount()->getName()) ?><br>
+        <em><?= $this->e($transaction->getDescription()) ?></em><br>
+        <a href="<?= $this->route('edit_transaction', ['transactionId' => $transaction->getId()]) ?>">Edit</a>
+      </article>
+      <?php endforeach; ?>
+    </section>
+  <?php endforeach; ?>
 <?php endif; ?>

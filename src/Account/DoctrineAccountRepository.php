@@ -131,6 +131,6 @@ class DoctrineAccountRepository implements AccountRepository
             throw Exception::databaseUnknownError($error);
         }
 
-        return Account::fromArray($data ?: []);
+        return Account::fromArray($data ?: [$field => $value]);
     }
 }

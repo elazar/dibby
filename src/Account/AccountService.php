@@ -5,7 +5,7 @@ namespace Elazar\Dibby\Account;
 class AccountService
 {
     public function __construct(
-        AccountRepository $accountRepository,
+        private AccountRepository $accountRepository,
     ) { }
 
     public function persistAccount(Account $account): Account

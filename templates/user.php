@@ -4,10 +4,12 @@ if (isset($id)) {
     $title = 'Edit User';
     $route = 'edit_user';
     $routeParams = ['userId' => $id];
+    $button = 'Updating User...';
 } else {
     $title = 'Add User';
     $route = 'add_user';
     $routeParams = null;
+    $button = 'Adding User...';
 }
 
 $this->layout('layout');
@@ -44,5 +46,9 @@ $this->layout('layout');
   <label for="email">E-mail</label>
   <input type="email" id="email" name="email" value="<?= $this->e($email ?? '') ?>" required>
 
-  <button type="submit"><?= isset($id) ? 'Update' : 'Add' ?> User</button>
+  <button id="user_button" type="submit"><?= isset($id) ? 'Update' : 'Add' ?> User</button>
 </form>
+
+<script>
+  lockButtonOnSubmit("user_button", "<?= $button ?>")
+</script>

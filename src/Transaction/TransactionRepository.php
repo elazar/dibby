@@ -7,14 +7,14 @@ use Elazar\Dibby\Account\Account;
 interface TransactionRepository
 {
     /**
-     * @return Transaction[]
+     * @throws \Elazar\Dibby\Exception if transaction cannot be retrieved
      */
-    public function getTransactions(): array;
+    public function getTransactionById(string $transactionId): Transaction;
 
     /**
      * @return Transaction[]
      */
-    public function getTransactionsByAccount(Account $account): array;
+    public function getTransactions(TransactionCriteria $criteria): array;
 
     /**
      * Should call withId() on $transaction and pass it a value for a unique

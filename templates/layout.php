@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="/pico.min.css">
   <link rel="stylesheet" href="/custom.css">
+  <script src="/custom.js"></script>
 </head>
 <body>
   <main class="container">

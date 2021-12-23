@@ -62,9 +62,9 @@ class DoctrineUserRepository implements UserRepository
      */
     public function getUsers(): array
     {
-        $connection = $this->connectionFactory->getReadConnection();
-        $table = $connection->quoteIdentifier(self::TABLE);
         try {
+            $connection = $this->connectionFactory->getReadConnection();
+            $table = $connection->quoteIdentifier(self::TABLE);
             $results = $connection->executeQuery(
                 <<<EOS
                 SELECT
