@@ -46,7 +46,7 @@ $title = (isset($id) ? 'Edit' : 'Add') . ' Transaction';
   <input id="credit_account" name="credit_account" list="accounts" type="text" value="<?= $this->e($creditAccount ?? '') ?>" placeholder="e.g. Groceries" required>
 
   <label for="description">Description</label>
-  <input id="description" name="description" type="text" value="<?= $this->e($description) ?>" placeholder="(Optional)">
+  <input id="description" name="description" type="text" value="<?= $this->e($description ?? '') ?>" placeholder="(Optional)">
 
   <label for="date">Date</label>
   <input id="date" name="date" type="date" value="<?= $this->e($date ?? '') ?>" required>
