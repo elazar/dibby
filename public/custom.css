@@ -1,6 +1,6 @@
-:root:not([data-theme="dark"]) {
-  --primary: #3949ab;
+:root {
   --block-spacing-vertical: var(--spacing);
+  --primary: #039be5;
 }
 
 h1, h2 {
@@ -58,4 +58,8 @@ nav ul.subnavigation li:not(:first-child)::before {
 
 .right {
   text-align: right;
+}
+
+.transaction-edit-link {
+  float: right;
 }

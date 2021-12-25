@@ -42,10 +42,10 @@ $transactionsByDate = array_reduce(
       <h2 class="center"><?= $date ?></h2>
       <?php foreach ($transactionsForDate as $transaction): ?>
       <article>
+        <a class="transaction-edit-link" href="<?= $this->route('edit_transaction', ['transactionId' => $transaction->getId()]) ?>">Edit</a>
         <strong><?= number_format($transaction->getAmount(), 2) ?></strong><br>
         <?= $this->e($transaction->getDebitAccount()->getName()) ?> &rarr; <?= $this->e($transaction->getCreditAccount()->getName()) ?><br>
         <em><?= $this->e($transaction->getDescription()) ?></em><br>
-        <a href="<?= $this->route('edit_transaction', ['transactionId' => $transaction->getId()]) ?>">Edit</a>
       </article>
       <?php endforeach; ?>
     </section>

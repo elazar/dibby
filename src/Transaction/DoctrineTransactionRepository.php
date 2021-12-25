@@ -88,6 +88,7 @@ class DoctrineTransactionRepository implements TransactionRepository
                 $sql->where("$date <= :dateEnd")
                     ->setParameter('dateEnd', $dateEnd->format('Y-m-d'));
             }
+            $sql->orderBy('date', 'desc');
             $result = $sql->executeQuery();
             $transactions = [];
             foreach ($result->iterateAssociative() as $row) {
