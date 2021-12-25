@@ -50,6 +50,7 @@ class RouteConfiguration
             ['GET', '/transactions/{transactionId}', TransactionController::class, 'edit_transaction'],
             ['GET', '/templates', TemplatesController::class, 'get_templates'],
             ['GET', '/accounts', AccountsController::class, 'get_accounts'],
+            ['GET', '/accounts/{accountId}', AccountController::class, 'get_account'],
             ['GET', '/activity', ActivityController::class, 'get_activity'],
             ['GET', '/users', UsersController::class, 'get_users'],
             ['GET', '/users/add', UserController::class, 'add_user'],

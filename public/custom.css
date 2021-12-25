@@ -3,6 +3,12 @@
   --primary: #039be5;
 }
 
+@media screen {
+  section, body > main.container {
+    --block-spacing-vertical: var(--spacing);
+  }
+}
+
 h1, h2 {
   --typography-spacing-vertical: 0.75rem;
 }
@@ -60,6 +66,6 @@ nav ul.subnavigation li:not(:first-child)::before {
   text-align: right;
 }
 
-.transaction-edit-link {
+a.transaction-edit-link {
   float: right;
 }

@@ -44,8 +44,15 @@ $transactionsByDate = array_reduce(
       <article>
         <a class="transaction-edit-link" href="<?= $this->route('edit_transaction', ['transactionId' => $transaction->getId()]) ?>">Edit</a>
         <strong><?= number_format($transaction->getAmount(), 2) ?></strong><br>
-        <?= $this->e($transaction->getDebitAccount()->getName()) ?> &rarr; <?= $this->e($transaction->getCreditAccount()->getName()) ?><br>
-        <em><?= $this->e($transaction->getDescription()) ?></em><br>
+        <a href="<?= $this->route('get_account', ['accountId' => $transaction->getDebitAccount()->getId()]) ?>">
+          <?= $this->e($transaction->getDebitAccount()->getName()) ?>
+        </a>
+        &rarr;
+        <a href="<?= $this->route('get_account', ['accountId' => $transaction->getCreditAccount()->getId()]) ?>">
+          <?= $this->e($transaction->getCreditAccount()->getName()) ?>
+        </a>
+        <br>
+        <em><?= $this->e($transaction->getDescription()) ?></em>
       </article>
       <?php endforeach; ?>
     </section>
