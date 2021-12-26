@@ -51,18 +51,28 @@ $title = (isset($id) ? 'Edit' : 'Add') . ' Transaction';
   <label for="date">Date</label>
   <input id="date" name="date" type="date" value="<?= $this->e($date ?? '') ?>" required>
 
-  <button id="transaction_button" type="submit"><?php if (isset($id)): ?>Update<?php else: ?>Add<?php endif; ?> Transaction</button>
+  <?php if (isset($id)): ?>
+  <input type="submit" id="update_transaction_button" name="action" value="Update Transaction">
+  <input type="submit" id="delete_transaction_button" name="action" value="Delete Transaction">
+  <?php else: ?>
+  <input type="submit" id="add_transaction_button" name="action" value="Add Transaction">
+  <?php endif; ?>
 </form>
 
 <script>
-  lockButtonOnSubmit("transaction_button", "<?= isset($id) ? 'Updating' : 'Adding' ?> Transaction...")
-</script>
-
-<?php if (!isset($id)): ?>
-<script>
+  <?php if (isset($id)): ?>
+  lockButtonOnSubmit("update_transaction_button", "Updating Transaction...")
+  lockButtonOnSubmit("delete_transaction_button", "Deleting Transaction...")
+  document.getElementById("delete_transaction_button").addEventListener("click", (evt) => {
+    if (!confirm("Delete this transaction?")) {
+      evt.preventDefault();
+    }
+  });
+  <?php else: ?>
+  lockButtonOnSubmit("add_transaction_button", "Adding Transaction...")
   const now = new Date()
   const offset = now.getTimezoneOffset()
   const local = new Date(now.getTime() - (offset * 60000))
   document.getElementById("date").valueAsDate = local
+  <?php endif; ?>
 </script>
-<?php endif; ?>

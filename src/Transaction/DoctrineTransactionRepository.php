@@ -7,6 +7,7 @@ use Elazar\Dibby\{
     Account\Account,
     Account\AccountRepository,
     Database\DoctrineConnectionFactory,
+    Exception,
 };
 use Psr\Log\LoggerInterface;
 use Ramsey\Uuid\Uuid;
@@ -38,7 +39,20 @@ class DoctrineTransactionRepository implements TransactionRepository
                 EOS,
                 [$transactionId],
             );
+            /**
+             * @var false|array{
+             *     debit_account_id: string,
+             *     credit_account_id: string,
+             *     amount: float,
+             *     date: string|DateTimeImmutable,
+             *     id: string,
+             *     description: string
+             *   } $data
+             */
             $data = $result->fetchAssociative();
+            if ($data === false) {
+                throw Exception::transactionNotFound($transactionId);
+            }
             return $this->fromArray($data);
         } catch (Throwable $error) {
             $this->logger->error('Error getting transaction', [
@@ -98,6 +112,16 @@ class DoctrineTransactionRepository implements TransactionRepository
             $sql->orderBy('date', 'desc');
             $result = $sql->executeQuery();
             $transactions = [];
+            /**
+             * @var array{
+             *     debit_account_id: string,
+             *     credit_account_id: string,
+             *     amount: float,
+             *     date: string|DateTimeImmutable,
+             *     id: string,
+             *     description: string
+             *   } $row
+             */
             foreach ($result->iterateAssociative() as $row) {
                 $transactions[] = $this->fromArray($row);
             }
@@ -141,7 +165,14 @@ class DoctrineTransactionRepository implements TransactionRepository
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param array{
+     *     debit_account_id: string,
+     *     credit_account_id: string,
+     *     amount: float,
+     *     date: string|DateTimeImmutable,
+     *     id: string,
+     *     description: string
+     *   } $data
      */
     private function fromArray(array $data): Transaction
     {
@@ -151,7 +182,7 @@ class DoctrineTransactionRepository implements TransactionRepository
             amount: $data['amount'],
             debitAccount: $debitAccount,
             creditAccount: $creditAccount,
-            date: new DateTimeImmutable($data['date']),
+            date: is_string($data['date']) ? new DateTimeImmutable($data['date']) : $data['date'],
             id: $data['id'],
             description: $data['description'],
         );
@@ -182,6 +213,20 @@ class DoctrineTransactionRepository implements TransactionRepository
         } catch (Throwable $error) {
             $this->logger->error('Error getting account balance', [
                 'account_id' => $account->getId(),
+                'error' => $error,
+            ]);
+            throw Exception::databaseUnknownError($error);
+        }
+    }
+
+    public function deleteTransactionById(string $transactionId): void
+    {
+        try {
+            $connection = $this->connectionFactory->getWriteConnection();
+            $connection->delete(self::TABLE, ['id' => $transactionId]);
+        } catch (Throwable $error) {
+            $this->logger->error('Error deleting transaction', [
+                'transaction_id' => $transactionId,
                 'error' => $error,
             ]);
             throw Exception::databaseUnknownError($error);

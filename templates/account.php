@@ -3,12 +3,9 @@
 <nav class="grid">
   <ol aria-label="breadcrumb" class="breadcrumb">
     <li><a href="<?= $this->route('get_menu') ?>">Menu</a></li>
-    <li><a href="<?= $this->route('get_accounts') ?>">Accounts</a></li>
+    <li><a href="<?= $this->route('get_accounts') ?>">List Accounts</a></li>
     <li><a href="<?= $this->route('get_account', ['accountId' => $account->getId()]) ?>" aria-current="page"><?= $this->e($account->getName()) ?></a></li>
   </ol>
-  <ul aria-label="subnavigation" class="subnavigation">
-    <li><a href="<?= $this->route('get_accounts') ?>">List Accounts</a></li>
-  </ul>
 </nav>
 
 <h1 class="center">Transactions</h1>
@@ -21,20 +18,22 @@
     <a class="transaction-edit-link" href="<?= $this->route('edit_transaction', ['transactionId' => $transaction->getId()]) ?>">Edit</a>
     <strong><?= number_format($transaction->getAmount(), 2) ?></strong>
     <?php if ($transaction->getDebitAccount()->getId() === $account->getId()): ?>
-        <?php $factor = -1; ?>
+        <?php $factor = 1; ?>
     &rarr;
     <a href="<?= $this->route('get_account', ['accountId' => $transaction->getCreditAccount()->getId()]) ?>">
       <?= $this->e($transaction->getCreditAccount()->getName()) ?>
     </a>
     <?php else: ?>
-        <?php $factor = 1; ?>
+        <?php $factor = -1; ?>
     &larr;
     <a href="<?= $this->route('get_account', ['accountId' => $transaction->getDebitAccount()->getId()]) ?>">
       <?= $this->e($transaction->getDebitAccount()->getName()) ?>
     </a>
     <?php endif; ?>
-    <br>
-    <em><?= $this->e($transaction->getDescription()) ?></em>
+    <?php if ($transaction->getDescription()): ?>
+      <br>
+      <em><?= $this->e($transaction->getDescription()) ?></em>
+    <?php endif; ?>
     <br>
     Balance: <?= number_format($balance, 2) ?>
   </article>

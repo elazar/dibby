@@ -16,7 +16,13 @@ $this->layout('layout');
           <li><a href="<?= $this->route('add_transaction') ?>">Add Transaction</a></li>
         </ul>
       </li>
-     <li>
+      <li>
+        <h2>Accounts</h2>
+        <ul>
+          <li><a href="<?= $this->route('get_accounts') ?>">List Accounts</a></li>
+        </ul>
+      </li>
+      <li>
         <h2>Users</h2>
         <ul>
           <li><a href="<?= $this->route('get_users') ?>">List Users</a></li>

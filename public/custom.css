@@ -37,7 +37,7 @@ nav ol.breadcrumb li {
 }
 
 nav ol.breadcrumb li:not(:first-child)::before {
-  content: " > ";
+  content: " → ";
   padding-right: 5px;
 }
 
@@ -50,11 +50,11 @@ nav ul.subnavigation {
 
 nav ul.subnavigation li {
   display: inline-flex;
-  padding-right: 0;
+  padding: 0;
 }
 
 nav ul.subnavigation li:not(:first-child)::before {
-  content: " - ";
+  content: ", ";
   padding-right: 5px;
 }
 

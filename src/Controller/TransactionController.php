@@ -23,6 +23,9 @@ class TransactionController
         private TransactionRepository $transactionRepository,
     ) { }
 
+    /**
+     * @param array<string, string> $args
+     */
     public function __invoke(ServerRequestInterface $request, array $args): ResponseInterface
     {
         /** @var ?\Elazar\Dibby\User\User $user */
@@ -37,8 +40,12 @@ class TransactionController
 
         if (strcasecmp($request->getMethod(), 'post') === 0) {
             $body = (array) $request->getParsedBody();
-            $transaction = $this->transactionService->fromArray($body);
-            $this->transactionService->persistTransaction($transaction);
+            if ($body['action'] === 'Delete Transaction') {
+                $this->transactionRepository->deleteTransactionById($body['id']);
+            } else {
+                $transaction = $this->transactionService->fromArray($body);
+                $this->transactionService->persistTransaction($transaction);
+            }
             return $this->responseGenerator->redirect('get_transactions');
         } elseif (isset($args['transactionId'])) {
             $transaction = $this->transactionRepository->getTransactionById($args['transactionId']);

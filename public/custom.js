@@ -1,8 +1,10 @@
 const lockButtonOnSubmit = (id, text) => {
   const button = document.getElementById(id)
-  button.form.addEventListener("submit", () => {
+  button.form.addEventListener("submit", (evt) => {
+    if (evt.target !== button) {
+      return
+    }
     button.innerText = text
-    button.disabled = true
     if (button.ariaBusy !== undefined) {
       button.ariaBusy = true
     } else {
