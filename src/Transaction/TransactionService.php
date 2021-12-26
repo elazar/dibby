@@ -60,7 +60,7 @@ class TransactionService
 
     public function persistTransaction(Transaction $transaction): Transaction
     {
-        if ($transaction->getAmount() <= 0) {
+        if ($transaction->getAmount() < 0) {
             throw Exception::invalidInput('Transaction amount must be positive');
         }
         return $this->transactionRepository->persistTransaction($transaction);

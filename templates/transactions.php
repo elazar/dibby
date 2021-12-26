@@ -1,23 +1,4 @@
-<?php
-
-use Elazar\Dibby\Transaction\Transaction;
-
-$this->layout('layout');
-
-$transactionsByDate = array_reduce(
-    $transactions,
-    function (array $byDate, Transaction $transaction) {
-        $date = $transaction->getDate()->format('D, M j, Y');
-        if (!isset($byDate[$date])) {
-            $byDate[$date] = [];
-        }
-        $byDate[$date][] = $transaction;
-        return $byDate;
-    },
-    [],
-);
-
-?>
+<?php $this->layout('layout'); ?>
 
 <nav class="grid">
   <ol aria-label="breadcrumb" class="breadcrumb">
@@ -37,7 +18,7 @@ $transactionsByDate = array_reduce(
   <p>Want to <a href="<?= $this->route('add_transaction') ?>">add some</a>?</p>
 </div>
 <?php else: ?>
-  <?php foreach ($transactionsByDate as $date => $transactionsForDate): ?>
+  <?php foreach ($this->transactionsByDate($transactions) as $date => $transactionsForDate): ?>
     <section>
       <h2 class="center"><?= $date ?></h2>
       <?php foreach ($transactionsForDate as $transaction): ?>

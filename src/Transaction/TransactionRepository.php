@@ -24,4 +24,6 @@ interface TransactionRepository
      * @throws \Elazar\Dibby\Exception if transaction cannot be persisted
      */
     public function persistTransaction(Transaction $transaction): Transaction;
+
+    public function getAccountBalance(Account $account): float;
 }

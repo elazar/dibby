@@ -25,6 +25,7 @@ use Elazar\Dibby\Configuration\{
 };
 
 use Elazar\Dibby\Controller\{
+    AccountController,
     AccountsController,
     ActivityController,
     HelpController,
@@ -66,6 +67,7 @@ use Elazar\Dibby\Jwt\{
 use Elazar\Dibby\Template\{
     PlatesRouteExtension,
     PlatesTemplateEngine,
+    PlatesTransactionExtension,
     TemplateEngine,
 };
 
@@ -223,9 +225,11 @@ class PimpleServiceProvider implements ServiceProviderInterface
         $pimple[PlatesRouteExtension::class] = fn($c) => new PlatesRouteExtension(
             $c[RouteConfiguration::class],
         );
+        $pimple[PlatesTransactionExtension::class] = fn($c) => new PlatesTransactionExtension;
         $pimple[PlatesEngine::class] = function ($c) {
             $engine = new PlatesEngine(__DIR__ . '/../templates');
             $engine->loadExtension($c[PlatesRouteExtension::class]);
+            $engine->loadExtension($c[PlatesTransactionExtension::class]);
             return $engine;
         };
         $pimple[PlatesTemplateEngine::class] = fn($c) => new PlatesTemplateEngine(
@@ -364,6 +368,11 @@ class PimpleServiceProvider implements ServiceProviderInterface
             $c[UserService::class],
         );
         $pimple[AccountsController::class] = fn($c) => new AccountsController(
+            $c[ResponseGenerator::class],
+        );
+        $pimple[AccountController::class] = fn($c) => new AccountController(
+            $c[AccountRepository::class],
+            $c[TransactionRepository::class],
             $c[ResponseGenerator::class],
         );
         $pimple[ActivityController::class] = fn($c) => new ActivityController(

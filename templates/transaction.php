@@ -31,7 +31,7 @@ $title = (isset($id) ? 'Edit' : 'Add') . ' Transaction';
   <?php endif; ?>
 
   <label for="amount">Amount</label>
-  <input id="amount" name="amount" type="number" value="<?= $this->e($amount ?? '') ?>" min="0.01" step="0.01" required autofocus placeholder="e.g. 1.99">
+  <input id="amount" name="amount" type="number" value="<?= $this->e($amount ?? '') ?>" min="0" step="0.01" required autofocus placeholder="e.g. 1.99">
 
   <datalist id="accounts">
     <?php foreach ($accounts as $account): ?>

@@ -3,6 +3,7 @@
 namespace Elazar\Dibby;
 
 use Elazar\Dibby\Controller\{
+    AccountController,
     AccountsController,
     ActivityController,
     HelpController,

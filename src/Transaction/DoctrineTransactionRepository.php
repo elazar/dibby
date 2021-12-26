@@ -72,12 +72,19 @@ class DoctrineTransactionRepository implements TransactionRepository
                     ->setParameter('amountEnd', $amountEnd);
             }
             if ($debitAccountId = $criteria->getDebitAccountId()) {
-                $sql->where('debit_account_id = :debitAccountId')
-                    ->setParameter('debitAccountId', $debitAccountId);
+                $sql->setParameter('debitAccountId', $debitAccountId);
             }
             if ($creditAccountId = $criteria->getDebitAccountId()) {
-                $sql->where('credit_account_id = :creditAccountId')
-                    ->setParameter('creditAccountId', $creditAccountId);
+                $sql->setParameter('creditAccountId', $creditAccountId);
+            }
+            if ($debitAccountId) {
+                $sql->where('debit_account_id = :debitAccountId');
+                if ($debitAccountId === $creditAccountId) {
+                    $sql->orWhere('credit_account_id = :creditAccountId');
+                }
+            }
+            if ($creditAccountId && $creditAccountId !== $debitAccountId) {
+                $sql->where('credit_account_id = :creditAccountId');
             }
             $date = $connection->quoteIdentifier('date');
             if ($dateStart = $criteria->getDateStart()) {
@@ -133,6 +140,9 @@ class DoctrineTransactionRepository implements TransactionRepository
         }
     }
 
+    /**
+     * @param array<string, mixed> $data
+     */
     private function fromArray(array $data): Transaction
     {
         $debitAccount = $this->accountRepository->getAccountById($data['debit_account_id']);
@@ -145,5 +155,36 @@ class DoctrineTransactionRepository implements TransactionRepository
             id: $data['id'],
             description: $data['description'],
         );
+    }
+
+    public function getAccountBalance(Account $account): float
+    {
+        try {
+            $connection = $this->connectionFactory->getReadConnection();
+            $table = $connection->quoteIdentifier(self::TABLE);
+            $debits = $connection->fetchOne(
+                <<<EOS
+                SELECT SUM(amount)
+                FROM $table
+                WHERE debit_account_id = ?
+                EOS,
+                [$account->getId()]
+            );
+            $credits = $connection->fetchOne(
+                <<<EOS
+                SELECT SUM(amount)
+                FROM $table
+                WHERE credit_account_id = ?
+                EOS,
+                [$account->getId()]
+            );
+            return $credits - $debits;
+        } catch (Throwable $error) {
+            $this->logger->error('Error getting account balance', [
+                'account_id' => $account->getId(),
+                'error' => $error,
+            ]);
+            throw Exception::databaseUnknownError($error);
+        }
     }
 }
