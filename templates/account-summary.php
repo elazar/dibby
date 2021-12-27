@@ -16,17 +16,15 @@
   <?php foreach ($transactionsForDate as $transaction): ?>
   <article>
     <a class="edit" href="<?= $this->route('edit_transaction', ['transactionId' => $transaction->getId()]) ?>">Edit</a>
-    <strong><?= number_format($transaction->getAmount(), 2) ?></strong>
+    <strong><?= number_format($transaction->getAmount(), 2) ?></strong><br>
     <?php if ($transaction->getDebitAccount()->getId() === $account->getId()): ?>
         <?php $factor = 1; ?>
-    &rarr;
-    <a href="<?= $this->route('get_account_summary', ['accountId' => $transaction->getCreditAccount()->getId()]) ?>">
+    To: <a href="<?= $this->route('get_account_summary', ['accountId' => $transaction->getCreditAccount()->getId()]) ?>">
       <?= $this->e($transaction->getCreditAccount()->getName()) ?>
     </a>
     <?php else: ?>
         <?php $factor = -1; ?>
-    &larr;
-    <a href="<?= $this->route('get_account_summary', ['accountId' => $transaction->getDebitAccount()->getId()]) ?>">
+    From: <a href="<?= $this->route('get_account_summary', ['accountId' => $transaction->getDebitAccount()->getId()]) ?>">
       <?= $this->e($transaction->getDebitAccount()->getName()) ?>
     </a>
     <?php endif; ?>

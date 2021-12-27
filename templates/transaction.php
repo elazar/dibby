@@ -39,10 +39,10 @@ $title = (isset($id) ? 'Edit' : 'Add') . ' Transaction';
     <?php endforeach; ?>
   </datalist>
 
-  <label for="debit_account">Debit Account</label>
+  <label for="debit_account">From Account</label>
   <input id="debit_account" name="debit_account" list="accounts" type="text" value="<?= $this->e($debitAccount ?? '') ?>" placeholder="e.g. Checking" required>
 
-  <label for="credit_account">Credit Account</label>
+  <label for="credit_account">To Account</label>
   <input id="credit_account" name="credit_account" list="accounts" type="text" value="<?= $this->e($creditAccount ?? '') ?>" placeholder="e.g. Groceries" required>
 
   <label for="description">Description</label>
