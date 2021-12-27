@@ -21,7 +21,7 @@
     <tr>
       <td><?= $this->e($account->getName()) ?></td>
       <td class="right">
-        <a href="<?= $this->route('get_account_summary', ['accountId' => $account->getId()]) ?>">Summary</a>
+        <a href="<?= $this->route('get_account_summary', ['accountId' => $account->getId()]) ?>">View</a>
       </td>
       <td class="right">
         <a href="<?= $this->route('edit_account', ['accountId' => $account->getId()]) ?>">Edit</a>
