@@ -43,6 +43,13 @@ class CachingAccountRepository implements AccountRepository
         return $this->cacheById[$id];
     }
 
+    public function deleteAccount(string $id): void
+    {
+        $account = $this->getAccountById($id);
+        $this->accountRepository->deleteAccount($id);
+        unset($this->cacheById[$id], $this->cacheByName[$account->getName()]);
+    }
+
     public function getAccountByName(string $name): Account
     {
         if (!isset($this->cacheByName[$name])) {

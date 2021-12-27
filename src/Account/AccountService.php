@@ -24,4 +24,9 @@ class AccountService
         }
         return $account;
     }
+
+    public function deleteAccount(string $id): void
+    {
+        $this->accountRepository->deleteAccount($id);
+    }
 }

@@ -188,7 +188,7 @@ class DoctrineTransactionRepository implements TransactionRepository
         );
     }
 
-    public function getAccountBalance(Account $account): float
+    public function getAccountBalance(string $accountId): float
     {
         try {
             $connection = $this->connectionFactory->getReadConnection();
@@ -199,7 +199,7 @@ class DoctrineTransactionRepository implements TransactionRepository
                 FROM $table
                 WHERE debit_account_id = ?
                 EOS,
-                [$account->getId()]
+                [$accountId]
             );
             $credits = $connection->fetchOne(
                 <<<EOS
@@ -207,12 +207,37 @@ class DoctrineTransactionRepository implements TransactionRepository
                 FROM $table
                 WHERE credit_account_id = ?
                 EOS,
-                [$account->getId()]
+                [$accountId]
             );
             return $credits - $debits;
         } catch (Throwable $error) {
             $this->logger->error('Error getting account balance', [
-                'account_id' => $account->getId(),
+                'account_id' => $accountId,
+                'error' => $error,
+            ]);
+            throw Exception::databaseUnknownError($error);
+        }
+    }
+
+    public function getAccountTransactionCount(string $accountId): int
+    {
+        try {
+            $connection = $this->connectionFactory->getReadConnection();
+            $table = $connection->quoteIdentifier(self::TABLE);
+            /** @var int|false $result */
+            $result = $connection->fetchOne(
+                <<<EOS
+                SELECT COUNT(*)
+                FROM $table
+                WHERE debit_account_id = :id
+                OR credit_account_id = :id
+                EOS,
+                ['id' => $accountId]
+            );
+            return $result === false ? 0 : (int) $result;
+        } catch (Throwable $error) {
+            $this->logger->error('Error getting account transaction count', [
+                'account_id' => $accountId,
                 'error' => $error,
             ]);
             throw Exception::databaseUnknownError($error);

@@ -27,7 +27,7 @@ class DoctrineAccountRepository implements AccountRepository
         /** @var string */
         $accountName = $account->getName();
         $existing = $this->getAccountByName($accountName);
-        if ($account->getId() !== $existing->getId()) {
+        if ($existing->getId() !== null && $account->getId() !== $existing->getId()) {
             throw Exception::accountExists($accountName);
         }
 
@@ -77,7 +77,7 @@ class DoctrineAccountRepository implements AccountRepository
             /** @var Account[] */
             $accounts = [];
             while (
-                /** @var array<string, string> $row */
+                /** @var array{id: string, name: string} $row */
                 $row = $results->fetchAssociative()
             ) {
                 $accounts[] = Account::fromArray($row);
@@ -125,12 +125,26 @@ class DoctrineAccountRepository implements AccountRepository
             );
         } catch (Throwable $error) {
             $this->logger->error('Error checking for existing account', [
-                'account_name' => $name,
+                $field => $value,
                 'error' => $error,
             ]);
             throw Exception::databaseUnknownError($error);
         }
 
         return Account::fromArray($data ?: [$field => $value]);
+    }
+
+    public function deleteAccount(string $id): void
+    {
+        try {
+            $connection = $this->connectionFactory->getWriteConnection();
+            $connection->delete(self::TABLE, ['id' => $id]);
+        } catch (Throwable $error) {
+            $this->logger->error('Error deleting account', [
+                'account_id' => $id,
+                'error' => $error,
+            ]);
+            throw Exception::databaseUnknownError($error);
+        }
     }
 }

@@ -25,7 +25,9 @@ interface TransactionRepository
      */
     public function persistTransaction(Transaction $transaction): Transaction;
 
-    public function getAccountBalance(Account $account): float;
+    public function getAccountBalance(string $accountId): float;
+
+    public function getAccountTransactionCount(string $accountId): int;
 
     /**
      * @throws \Elazar\Dibby\Exception if transaction cannot be deleted

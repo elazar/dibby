@@ -66,6 +66,6 @@ nav ul.subnavigation li:not(:first-child)::before {
   text-align: right;
 }
 
-a.transaction-edit-link {
+a.edit {
   float: right;
 }

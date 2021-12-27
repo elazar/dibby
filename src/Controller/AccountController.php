@@ -3,20 +3,21 @@
 namespace Elazar\Dibby\Controller;
 
 use Elazar\Dibby\{
+    Account\Account,
     Account\AccountRepository,
-    Transaction\TransactionCriteria,
-    Transaction\TransactionRepository,
+    Account\AccountService,
 };
 use Psr\Http\Message\{
     ResponseInterface,
     ServerRequestInterface,
 };
+use Throwable;
 
 class AccountController
 {
     public function __construct(
         private AccountRepository $accountRepository,
-        private TransactionRepository $transactionRepository,
+        private AccountService $accountService,
         private ResponseGenerator $responseGenerator,
     ) { }
 
@@ -31,18 +32,26 @@ class AccountController
             return $this->responseGenerator->redirect('get_login');
         }
 
-        $account = $this->accountRepository->getAccountById($args['accountId']);
-        $criteria = new TransactionCriteria(
-            debitAccountId: $account->getId(),
-            creditAccountId: $account->getId(),
-        );
-        $transactions = $this->transactionRepository->getTransactions($criteria);
-        $balance = $this->transactionRepository->getAccountBalance($account);
-        $data = [
-            'account' => $account,
-            'balance' => $balance,
-            'transactions' => $transactions,
-        ];
+        $data = [];
+        if (strcasecmp($request->getMethod(), 'post') === 0) {
+            $body = (array) $request->getParsedBody();
+            try {
+                $account = $this->accountService->persistAccount(
+                    Account::fromArray($body),
+                );
+                return $this->responseGenerator->redirect('get_accounts');
+            } catch (Throwable $error) {
+                $data += $body;
+                $data['error'] = $error->getMessage();
+                $status = 400;
+            }
+        } elseif (isset($args['accountId'])) {
+            $account = $this->accountRepository->getAccountById($args['accountId']);
+            $data = [
+                'id' => $account->getId(),
+                'name' => $account->getName(),
+            ];
+        }
         return $this->responseGenerator->render($request, 'account', $data);
     }
 }

@@ -47,7 +47,7 @@ class Account
     }
 
     /**
-     * @return array<string, string>
+     * @return array{id: string, name: string}
      */
     public function toArray(): array
     {

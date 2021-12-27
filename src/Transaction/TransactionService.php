@@ -4,6 +4,7 @@ namespace Elazar\Dibby\Transaction;
 
 use DateTimeImmutable;
 use Elazar\Dibby\{
+    Account\Account,
     Account\AccountService,
     Exception,
 };
@@ -63,14 +64,49 @@ class TransactionService
         if ($transaction->getAmount() < 0) {
             throw Exception::invalidInput('Transaction amount must be positive');
         }
+        if ($transaction->getId()) {
+            $existing = $this->transactionRepository->getTransactionById($transaction->getId());
+            $debitAccountId = $existing->getDebitAccount()->getId();
+            if ($debitAccountId !== null && $debitAccountId !== $transaction->getDebitAccount()->getId()) {
+                $this->deleteAccountIfEmpty($debitAccountId);
+            }
+            $creditAccountId = $existing->getCreditAccount()->getId();
+            if ($creditAccountId !== null && $creditAccountId !== $transaction->getCreditAccount()->getId()) {
+                $this->deleteAccountIfEmpty($creditAccountId);
+            }
+        }
         return $this->transactionRepository->persistTransaction($transaction);
     }
 
+    public function deleteTransaction(Transaction $transaction): void
+    {
+        /** @var string $transactionId */
+        $transactionId = $transaction->getId();
+        /** @var string $debitAccountId */
+        $debitAccountId = $transaction->getDebitAccount()->getId();
+        /** @var string $creditAccountId */
+        $creditAccountId = $transaction->getCreditAccount()->getId();
+        $this->transactionRepository->deleteTransactionById($transactionId);
+        $this->deleteAccountIfEmpty($debitAccountId);
+        $this->deleteAccountIfEmpty($creditAccountId);
+    }
+
+    /**
+     * @return Transaction[]
+     */
     public function getTransactions(TransactionCriteria $criteria): array
     {
         if ($criteria->isEmpty()) {
             throw Exception::invalidInput('No criteria provided to filter transactions');
         }
         return $this->transactionRepository->getTransactions($criteria);
+    }
+
+    private function deleteAccountIfEmpty(string $accountId): void
+    {
+        $transactionCount = $this->transactionRepository->getAccountTransactionCount($accountId);
+        if ($transactionCount === 0) {
+            $this->accountService->deleteAccount($accountId);
+        }
     }
 }

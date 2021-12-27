@@ -27,4 +27,6 @@ interface AccountRepository
      * exists in the database with that name.
      */
     public function getAccountByName(string $name): Account;
+
+    public function deleteAccount(string $id): void;
 }

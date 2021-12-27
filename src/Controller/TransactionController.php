@@ -41,7 +41,8 @@ class TransactionController
         if (strcasecmp($request->getMethod(), 'post') === 0) {
             $body = (array) $request->getParsedBody();
             if ($body['action'] === 'Delete Transaction') {
-                $this->transactionRepository->deleteTransactionById($body['id']);
+                $transaction = $this->transactionRepository->getTransactionById($body['id']);
+                $this->transactionService->deleteTransaction($transaction);
             } else {
                 $transaction = $this->transactionService->fromArray($body);
                 $this->transactionService->persistTransaction($transaction);

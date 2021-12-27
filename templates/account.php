@@ -3,41 +3,28 @@
 <nav class="grid">
   <ol aria-label="breadcrumb" class="breadcrumb">
     <li><a href="<?= $this->route('get_menu') ?>">Menu</a></li>
-    <li><a href="<?= $this->route('get_accounts') ?>">List Accounts</a></li>
-    <li><a href="<?= $this->route('get_account', ['accountId' => $account->getId()]) ?>" aria-current="page"><?= $this->e($account->getName()) ?></a></li>
+    <li><a href="<?= $this->route('edit_account', ['accountId' => $id]) ?>" aria-current="page">Edit Account</a></li>
   </ol>
+  <ul aria-label="subnavigation" class="subnavigation">
+    <li><a href="<?= $this->route('get_accounts') ?>">List Accounts</a></li>
+  </ul>
 </nav>
 
-<h1 class="center">Transactions</h1>
+<h1 class="center">Edit Account</h1>
 
-<?php foreach ($this->transactionsByDate($transactions) as $date => $transactionsForDate): ?>
-<section>
-  <h2 class="center"><?= $date ?></h2>
-  <?php foreach ($transactionsForDate as $transaction): ?>
-  <article>
-    <a class="transaction-edit-link" href="<?= $this->route('edit_transaction', ['transactionId' => $transaction->getId()]) ?>">Edit</a>
-    <strong><?= number_format($transaction->getAmount(), 2) ?></strong>
-    <?php if ($transaction->getDebitAccount()->getId() === $account->getId()): ?>
-        <?php $factor = 1; ?>
-    &rarr;
-    <a href="<?= $this->route('get_account', ['accountId' => $transaction->getCreditAccount()->getId()]) ?>">
-      <?= $this->e($transaction->getCreditAccount()->getName()) ?>
-    </a>
-    <?php else: ?>
-        <?php $factor = -1; ?>
-    &larr;
-    <a href="<?= $this->route('get_account', ['accountId' => $transaction->getDebitAccount()->getId()]) ?>">
-      <?= $this->e($transaction->getDebitAccount()->getName()) ?>
-    </a>
-    <?php endif; ?>
-    <?php if ($transaction->getDescription()): ?>
-      <br>
-      <em><?= $this->e($transaction->getDescription()) ?></em>
-    <?php endif; ?>
-    <br>
-    Balance: <?= number_format($balance, 2) ?>
-  </article>
-    <?php $balance += $factor * $transaction->getAmount(); ?>
-  <?php endforeach; ?>
-</section>
-<?php endforeach; ?>
+<?php if (isset($error)): ?>
+<p><strong><?= $this->e($error) ?></strong></p>
+<?php endif; ?>
+
+<form method="post" action="<?= $this->route('post_accounts') ?>">
+  <input type="hidden" name="id" value="<?= $this->e($id) ?>">
+
+  <label for="name">Name</label>
+  <input type="text" id="name" name="name" value="<?= $this->e($name) ?>" required autofocus>
+
+  <button id="account_button" type="submit">Update Account</button>
+</form>
+
+<script>
+  lockButtonOnSubmit("account_button", "Updating Account...")
+</script>

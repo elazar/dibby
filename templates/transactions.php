@@ -23,13 +23,13 @@
       <h2 class="center"><?= $date ?></h2>
       <?php foreach ($transactionsForDate as $transaction): ?>
       <article>
-        <a class="transaction-edit-link" href="<?= $this->route('edit_transaction', ['transactionId' => $transaction->getId()]) ?>">Edit</a>
+        <a class="edit" href="<?= $this->route('edit_transaction', ['transactionId' => $transaction->getId()]) ?>">Edit</a>
         <strong><?= number_format($transaction->getAmount(), 2) ?></strong><br>
-        <a href="<?= $this->route('get_account', ['accountId' => $transaction->getDebitAccount()->getId()]) ?>">
+        <a href="<?= $this->route('get_account_summary', ['accountId' => $transaction->getDebitAccount()->getId()]) ?>">
           <?= $this->e($transaction->getDebitAccount()->getName()) ?>
         </a>
         &rarr;
-        <a href="<?= $this->route('get_account', ['accountId' => $transaction->getCreditAccount()->getId()]) ?>">
+        <a href="<?= $this->route('get_account_summary', ['accountId' => $transaction->getCreditAccount()->getId()]) ?>">
           <?= $this->e($transaction->getCreditAccount()->getName()) ?>
         </a>
         <br>

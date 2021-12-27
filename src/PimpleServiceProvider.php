@@ -26,6 +26,7 @@ use Elazar\Dibby\Configuration\{
 
 use Elazar\Dibby\Controller\{
     AccountController,
+    AccountSummaryController,
     AccountsController,
     ActivityController,
     HelpController,
@@ -368,9 +369,15 @@ class PimpleServiceProvider implements ServiceProviderInterface
             $c[UserService::class],
         );
         $pimple[AccountsController::class] = fn($c) => new AccountsController(
+            $c[AccountRepository::class],
             $c[ResponseGenerator::class],
         );
         $pimple[AccountController::class] = fn($c) => new AccountController(
+            $c[AccountRepository::class],
+            $c[AccountService::class],
+            $c[ResponseGenerator::class],
+        );
+        $pimple[AccountSummaryController::class] = fn($c) => new AccountSummaryController(
             $c[AccountRepository::class],
             $c[TransactionRepository::class],
             $c[ResponseGenerator::class],

@@ -4,6 +4,7 @@ namespace Elazar\Dibby;
 
 use Elazar\Dibby\Controller\{
     AccountController,
+    AccountSummaryController,
     AccountsController,
     ActivityController,
     HelpController,
@@ -51,7 +52,9 @@ class RouteConfiguration
             ['GET', '/transactions/{transactionId}', TransactionController::class, 'edit_transaction'],
             ['GET', '/templates', TemplatesController::class, 'get_templates'],
             ['GET', '/accounts', AccountsController::class, 'get_accounts'],
-            ['GET', '/accounts/{accountId}', AccountController::class, 'get_account'],
+            ['POST', '/accounts', AccountController::class, 'post_accounts'],
+            ['GET', '/accounts/{accountId}', AccountController::class, 'edit_account'],
+            ['GET', '/accounts/{accountId}/summary', AccountSummaryController::class, 'get_account_summary'],
             ['GET', '/activity', ActivityController::class, 'get_activity'],
             ['GET', '/users', UsersController::class, 'get_users'],
             ['GET', '/users/add', UserController::class, 'add_user'],
