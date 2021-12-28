@@ -18,6 +18,9 @@ class Configuration
         private string $resetTokenTimeToLive,
         private string $smtpHost,
         private int $smtpPort,
+        private ?string $smtpUsername = null,
+        private ?string $smtpPassword = null,
+        private bool $smtpTls = false,
     ) { }
 
     public function getDatabaseReadConfiguration(): DatabaseConfiguration
@@ -73,5 +76,20 @@ class Configuration
     public function getSmtpPort(): int
     {
         return $this->smtpPort;
+    }
+
+    public function getSmtpUsername(): ?string
+    {
+        return $this->smtpUsername;
+    }
+
+    public function getSmtpPassword(): ?string
+    {
+        return $this->smtpPassword;
+    }
+
+    public function getSmtpTls(): bool
+    {
+        return $this->smtpTls;
     }
 }

@@ -38,6 +38,9 @@ return [
     'smtp' => [
         'host' => 'mailhog',
         'port' => 1025,
+        'username' => null,
+        'password' => null,
+        'tls' => true,
     ],
 
 ];

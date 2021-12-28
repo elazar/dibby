@@ -54,6 +54,7 @@ use Elazar\Dibby\Email\{
     EmailAdapter,
     EmailService,
     LaminasEmailAdapter,
+    LaminasSmtpOptionsFactory,
 };
 
 use Elazar\Dibby\Jwt\{
@@ -274,10 +275,10 @@ class PimpleServiceProvider implements ServiceProviderInterface
         $pimple[CliConfig::class] = fn($c) => new CliConfig($c[DoctrineConnectionFactory::class]);
 
         // E-mail
-        $pimple[SmtpOptions::class] = fn($c) => new SmtpOptions([
-            'host' => $c[Configuration::class]->getSmtpHost(),
-            'port' => (int) $c[Configuration::class]->getSmtpPort(),
-        ]);
+        $pimple[LaminasSmtpOptionsFactory::class] = fn($c) => new LaminasSmtpOptionsFactory(
+            $c[Configuration::class],
+        );
+        $pimple[SmtpOptions::class] = fn($c) => $c[LaminasSmtpOptionsFactory::class]->getSmtpOptions();
         $pimple[Smtp::class] = fn($c) => new Smtp($c[SmtpOptions::class]);
         $pimple[TransportInterface::class] = fn($c) => $c[Smtp::class];
         $pimple[LaminasEmailAdapter::class] = fn($c) => new LaminasEmailAdapter(

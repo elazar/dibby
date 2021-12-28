@@ -32,6 +32,9 @@ class PhpArrayConfigurationFactory implements ConfigurationFactory
             $this->settings['reset_token_ttl'],
             $this->settings['smtp']['host'],
             $this->settings['smtp']['port'],
+            $this->settings['smtp']['username'] ?? null,
+            $this->settings['smtp']['password'] ?? null,
+            $this->settings['smtp']['tls'] ?? false,
         );
     }
 

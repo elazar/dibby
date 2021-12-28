@@ -38,11 +38,17 @@ class EnvConfigurationFactory implements ConfigurationFactory
             $this->getEnv('RESET_TOKEN_TTL'),
             $this->getEnv('SMTP_HOST'),
             (int) $this->getEnv('SMTP_PORT'),
+            $this->getEnv('SMTP_USERNAME', null),
+            $this->getEnv('SMTP_PASSWORD', null),
+            $this->getEnv('SMTP_TLS') === 'true',
         );
     }
 
-    private function getEnv(string $name): string
+    /**
+     * @param mixed $default
+     */
+    private function getEnv(string $name, $default = ''): string
     {
-        return getenv("DIBBY_$name") ?: '';
+        return getenv("DIBBY_$name") ?: $default;
     }
 }
