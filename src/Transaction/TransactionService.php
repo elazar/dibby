@@ -66,6 +66,9 @@ class TransactionService
         }
         if ($transaction->getId()) {
             $existing = $this->transactionRepository->getTransactionById($transaction->getId());
+        }
+        $result = $this->transactionRepository->persistTransaction($transaction);
+        if (isset($existing)) {
             $debitAccountId = $existing->getDebitAccount()->getId();
             if ($debitAccountId !== null && $debitAccountId !== $transaction->getDebitAccount()->getId()) {
                 $this->deleteAccountIfEmpty($debitAccountId);
@@ -75,7 +78,7 @@ class TransactionService
                 $this->deleteAccountIfEmpty($creditAccountId);
             }
         }
-        return $this->transactionRepository->persistTransaction($transaction);
+        return $result;
     }
 
     public function deleteTransaction(Transaction $transaction): void
