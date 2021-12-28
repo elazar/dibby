@@ -2,4 +2,5 @@
 /.phpunit.result.cache
 /config.env
 /config.php
+/docker/nginx/letsencrypt
 /vendor

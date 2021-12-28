@@ -6,9 +6,12 @@ services:
     image: nginx:1.21-alpine
     ports:
       - "8080:80"
+      - "8443:443"
+    working_dir: /app
     volumes:
-      - .:/app:ro
-      - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - .:/app
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./docker/nginx/ssl.conf:/etc/nginx/conf.d/ssl.conf
     depends_on:
       - php
 
@@ -25,7 +28,9 @@ services:
       POSTGRES_PASSWORD: dibby
       POSTGRES_USER: dibby
       POSTGRES_DB: dibby
+    working_dir: /app
     volumes:
+      - .:/app
       - "pgsql:/var/lib/postgresql/data"
 
   mailhog:
