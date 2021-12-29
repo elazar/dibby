@@ -23,7 +23,7 @@ class TransactionService
      */
     public function fromArray(array $data): Transaction
     {
-        if (empty($data['amount'])) {
+        if (!isset($data['amount'])) {
             throw Exception::invalidInput('Amount is required');
         }
         if (empty($data['debit_account'])) {
@@ -61,9 +61,6 @@ class TransactionService
 
     public function persistTransaction(Transaction $transaction): Transaction
     {
-        if ($transaction->getAmount() < 0) {
-            throw Exception::invalidInput('Transaction amount must be positive');
-        }
         if ($transaction->getId()) {
             $existing = $this->transactionRepository->getTransactionById($transaction->getId());
         }
