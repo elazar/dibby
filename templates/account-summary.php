@@ -6,6 +6,9 @@
     <li><a href="<?= $this->route('get_accounts') ?>">List Accounts</a></li>
     <li><a href="<?= $this->route('get_account_summary', ['accountId' => $account->getId()]) ?>" aria-current="page"><?= $this->e($account->getName()) ?></a></li>
   </ol>
+  <ul aria-label="subnavigation" class="subnavigation">
+    <li><a href="<?= $this->route('add_transaction') ?>">Add Transaction</a></li>
+  </ul>
 </nav>
 
 <h1 class="center">Transactions</h1>
