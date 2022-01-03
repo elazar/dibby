@@ -9,6 +9,10 @@
   }
 }
 
+h1 {
+    margin-top: var(--typography-spacing-vertical);
+}
+
 h1, h2 {
   --typography-spacing-vertical: 0.75rem;
 }
