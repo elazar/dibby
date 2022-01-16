@@ -49,7 +49,7 @@ $title = (isset($id) ? 'Edit' : 'Add') . ' Transaction';
   <input id="description" name="description" type="text" value="<?= $this->e($description ?? '') ?>" placeholder="(Optional)">
 
   <label for="date">Date</label>
-  <input id="date" name="date" type="date" value="<?= $this->e($date ?? '') ?>" required>
+  <input id="date" name="date" type="date" value="<?= $this->e($date ?? '') ?>">
 
   <?php if (isset($id)): ?>
   <input type="submit" id="update_transaction_button" name="action" value="Update Transaction">
@@ -70,9 +70,5 @@ $title = (isset($id) ? 'Edit' : 'Add') . ' Transaction';
   });
   <?php else: ?>
   lockButtonOnSubmit("add_transaction_button", "Adding Transaction...")
-  const now = new Date()
-  const offset = now.getTimezoneOffset()
-  const local = new Date(now.getTime() - (offset * 60000))
-  document.getElementById("date").valueAsDate = local
   <?php endif; ?>
 </script>

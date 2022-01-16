@@ -16,7 +16,7 @@ class Transaction
         private float $amount,
         private Account $debitAccount,
         private Account $creditAccount,
-        private DateTimeImmutable $date,
+        private ?DateTimeImmutable $date = null,
         private ?string $id = null,
         private ?string $description = null,
     ) { }
@@ -51,12 +51,12 @@ class Transaction
         return $this->with('creditAccount', $creditAccount);
     }
 
-    public function getDate(): DateTimeImmutable
+    public function getDate(): ?DateTimeImmutable
     {
         return $this->date;
     }
 
-    public function withDate(DateTimeImmutable $date): static
+    public function withDate(?DateTimeImmutable $date): static
     {
         return $this->with('date', $date);
     }
@@ -82,7 +82,7 @@ class Transaction
     }
 
     /**
-     * @return array<string, float|string|bool>
+     * @return array<string, float|string|bool|null>
      */
     public function toArray(): array
     {
@@ -91,7 +91,7 @@ class Transaction
             'amount' => $this->amount,
             'debit_account_id' => $this->debitAccount->getId(),
             'credit_account_id' => $this->creditAccount->getId(),
-            'date' => $this->date->format(DateTimeImmutable::RFC7231),
+            'date' => $this->date?->format(DateTimeImmutable::RFC7231),
             'description' => $this->description,
         ];
     }

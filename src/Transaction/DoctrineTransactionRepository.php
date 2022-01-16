@@ -44,7 +44,7 @@ class DoctrineTransactionRepository implements TransactionRepository
              *     debit_account_id: string,
              *     credit_account_id: string,
              *     amount: float,
-             *     date: string|DateTimeImmutable,
+             *     date: string|DateTimeImmutable|null,
              *     id: string,
              *     description: string
              *   } $data
@@ -102,14 +102,14 @@ class DoctrineTransactionRepository implements TransactionRepository
             }
             $date = $connection->quoteIdentifier('date');
             if ($dateStart = $criteria->getDateStart()) {
-                $sql->where("$date >= :dateStart")
+                $sql->where("$date >= :dateStart or $date is null")
                     ->setParameter('dateStart', $dateStart->format('Y-m-d'));
             }
             if ($dateEnd = $criteria->getDateEnd()) {
-                $sql->where("$date <= :dateEnd")
+                $sql->where("$date <= :dateEnd or $date is null")
                     ->setParameter('dateEnd', $dateEnd->format('Y-m-d'));
             }
-            $sql->orderBy('date', 'desc');
+            $sql->orderBy('date', 'desc nulls first');
             $result = $sql->executeQuery();
             $transactions = [];
             /**
@@ -117,7 +117,7 @@ class DoctrineTransactionRepository implements TransactionRepository
              *     debit_account_id: string,
              *     credit_account_id: string,
              *     amount: float,
-             *     date: string|DateTimeImmutable,
+             *     date: string|DateTimeImmutable|null,
              *     id: string,
              *     description: string
              *   } $row
@@ -169,7 +169,7 @@ class DoctrineTransactionRepository implements TransactionRepository
      *     debit_account_id: string,
      *     credit_account_id: string,
      *     amount: float,
-     *     date: string|DateTimeImmutable,
+     *     date: string|DateTimeImmutable|null,
      *     id: string,
      *     description: string
      *   } $data

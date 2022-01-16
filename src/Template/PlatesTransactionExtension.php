@@ -34,7 +34,7 @@ class PlatesTransactionExtension implements ExtensionInterface
             fn(array $transactions): array => array_reduce(
                 $transactions,
                 function (array $byDate, Transaction $transaction) {
-                    $date = $transaction->getDate()->format('D, M j, Y');
+                    $date = $transaction->getDate()?->format('D, M j, Y') ?? 'Pending';
                     if (!isset($byDate[$date])) {
                         $byDate[$date] = [];
                     }

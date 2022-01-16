@@ -56,7 +56,7 @@ class TransactionController
                 'debitAccount' => $transaction->getDebitAccount()->getName(),
                 'creditAccount' => $transaction->getCreditAccount()->getName(),
                 'description' => $transaction->getDescription(),
-                'date' => $transaction->getDate()->format('Y-m-d'),
+                'date' => $transaction->getDate()?->format('Y-m-d'),
             ];
         }
 

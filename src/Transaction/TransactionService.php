@@ -32,17 +32,18 @@ class TransactionService
         if (empty($data['credit_account'])) {
             throw Exception::invalidInput('Credit Account is required');
         }
-        if (!isset($data['date'])) {
-            throw Exception::invalidInput('Date is required');
-        }
-        try {
-            $date = new DateTimeImmutable($data['date']);
-        } catch (\Exception $error) {
-            $this->logger->notice('Invalid transaction date entered', [
-                'date' => $data['date'],
-                'error' => $error,
-            ]);
-            throw Exception::invalidInput('Date is invalid');
+        if (!empty($data['date'])) {
+            try {
+                $date = new DateTimeImmutable($data['date']);
+            } catch (\Exception $error) {
+                $this->logger->notice('Invalid transaction date entered', [
+                    'date' => $data['date'],
+                    'error' => $error,
+                ]);
+                throw Exception::invalidInput('Date is invalid');
+            }
+        } else {
+            $date = null;
         }
 
         $amount = (float) $data['amount'];
