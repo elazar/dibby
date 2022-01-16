@@ -47,7 +47,7 @@ class Account
     }
 
     /**
-     * @return array{id: string, name: string}
+     * @return array{id?: non-empty-string, name?: non-empty-string}
      */
     public function toArray(): array
     {

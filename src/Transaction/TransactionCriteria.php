@@ -92,6 +92,9 @@ class TransactionCriteria implements \JsonSerializable
         return $this->with('dateEnd', $dateEnd);
     }
 
+    /**
+     * @return array<string, string|float>
+     */
     public function toArray(): array
     {
         return array_filter([
@@ -105,6 +108,9 @@ class TransactionCriteria implements \JsonSerializable
         ]);
     }
 
+    /**
+     * @return array<string, string|float>
+     */
     public function jsonSerialize(): array
     {
         return $this->toArray();
@@ -145,7 +151,7 @@ class TransactionCriteria implements \JsonSerializable
         }
         if (isset($data['date_end'])) {
             try {
-                $criteria = $criteria->withDateEnd((float) $data['date_end']);
+                $criteria = $criteria->withDateEnd(new DateTimeImmutable($data['date_end']));
             } catch (\Exception $error) {
                 throw Exception::invalidInput('End Date is invalid: ' . $error->getMessage());
             }

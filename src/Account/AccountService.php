@@ -2,6 +2,8 @@
 
 namespace Elazar\Dibby\Account;
 
+use Elazar\Dibby\Exception;
+
 class AccountService
 {
     public function __construct(

@@ -14,7 +14,6 @@ class UserService
 {
     public function __construct(
         private UserRepository $userRepository,
-        private PasswordGenerator $passwordGenerator,
         private PasswordHasher $passwordHasher,
         private ResetTokenGenerator $resetTokenGenerator,
         private EmailService $emailService,

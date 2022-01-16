@@ -308,7 +308,6 @@ class PimpleServiceProvider implements ServiceProviderInterface
         $pimple[UserRepository::class] = fn($c) => $c[DoctrineUserRepository::class];
         $pimple[UserService::class] = fn($c) => new UserService(
             $c[UserRepository::class],
-            $c[PasswordGenerator::class],
             $c[PasswordHasher::class],
             $c[ResetTokenGenerator::class],
             $c[EmailService::class],
