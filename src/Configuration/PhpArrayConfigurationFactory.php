@@ -15,26 +15,41 @@ class PhpArrayConfigurationFactory implements ConfigurationFactory
 
     public function getConfiguration(): Configuration
     {
-        /** @var array<string, array<string, string>> $db */
+        /** @var array<string, array<string, string>|string> $db */
         $db = $this->settings['db'];
-        $databaseReadConfiguration = $this->getDatabaseConfiguration($db['read']);
-        $databaseWriteConfiguration = $this->getDatabaseConfiguration($db['write']);
+        /** @var array<string, string> $read */
+        $read = $db['read'];
+        /** @var array<string, string> $write */
+        $write = $db['write'];
+        /** @var string */
+        $baseUrl = $this->settings['base_url'];
+        /** @var string */
+        $fromEmail = $this->settings['from_email'];
+        /** @var string */
+        $resetTokenTtl = $this->settings['reset_token_ttl'];
+        /** @var array<string, string> */
+        $session = $this->settings['session'];
+        /** @var array<string, string> */
+        $smtp = $this->settings['smtp'];
+
+        $databaseReadConfiguration = $this->getDatabaseConfiguration($read);
+        $databaseWriteConfiguration = $this->getDatabaseConfiguration($write);
 
         return new Configuration(
             $databaseReadConfiguration,
             $databaseWriteConfiguration,
-            $this->settings['base_url'],
-            $this->settings['from_email'],
-            $this->settings['session']['key'],
-            $this->settings['session']['cookie'],
-            $this->settings['session']['ttl'],
-            $this->settings['session']['secure'],
-            $this->settings['reset_token_ttl'],
-            $this->settings['smtp']['host'],
-            $this->settings['smtp']['port'],
-            $this->settings['smtp']['username'] ?? null,
-            $this->settings['smtp']['password'] ?? null,
-            $this->settings['smtp']['tls'] ?? false,
+            $baseUrl,
+            $fromEmail,
+            $session['key'],
+            $session['cookie'],
+            $session['ttl'],
+            (bool) $session['secure'],
+            $resetTokenTtl,
+            $smtp['host'],
+            (int) $smtp['port'],
+            $smtp['username'] ?? null,
+            $smtp['password'] ?? null,
+            isset($smtp['tls']) ? (bool) $smtp['tls'] : false,
         );
     }
 
