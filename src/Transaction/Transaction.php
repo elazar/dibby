@@ -86,13 +86,13 @@ class Transaction
      */
     public function toArray(): array
     {
-        return array_filter([
+        return [
             'id' => $this->id,
             'amount' => $this->amount,
             'debit_account_id' => $this->debitAccount->getId(),
             'credit_account_id' => $this->creditAccount->getId(),
             'date' => $this->date->format(DateTimeImmutable::RFC7231),
             'description' => $this->description,
-        ]);
+        ];
     }
 }
