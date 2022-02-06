@@ -6,6 +6,7 @@ use Elazar\Dibby\{
     Account\AccountRepository,
     Transaction\TransactionCriteria,
     Transaction\TransactionRepository,
+    Transaction\TransactionService,
 };
 use Psr\Http\Message\{
     ResponseInterface,
@@ -17,6 +18,7 @@ class AccountSummaryController
     public function __construct(
         private AccountRepository $accountRepository,
         private TransactionRepository $transactionRepository,
+        private TransactionService $transactionService,
         private ResponseGenerator $responseGenerator,
     ) { }
 
@@ -39,9 +41,11 @@ class AccountSummaryController
         );
         $transactions = $this->transactionRepository->getTransactions($criteria);
         $balance = $this->transactionRepository->getAccountBalance($accountId);
+        $summary = $this->transactionService->getSummary($transactions);
         $data = [
             'account' => $account,
             'balance' => $balance,
+            'summary' => $summary,
             'transactions' => $transactions,
         ];
         return $this->responseGenerator->render($request, 'account-summary', $data);

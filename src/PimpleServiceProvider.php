@@ -383,6 +383,7 @@ class PimpleServiceProvider implements ServiceProviderInterface
         $pimple[AccountSummaryController::class] = fn($c) => new AccountSummaryController(
             $c[AccountRepository::class],
             $c[TransactionRepository::class],
+            $c[TransactionService::class],
             $c[ResponseGenerator::class],
         );
         $pimple[ActivityController::class] = fn($c) => new ActivityController(
