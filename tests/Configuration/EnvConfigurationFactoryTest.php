@@ -6,6 +6,10 @@ use Elazar\Dibby\{
     Database\DatabaseConfiguration,
 };
 
+/**
+ * @param string[] $without
+ * @return array<string, bool|int|string>
+ */
 function env_configuration(array $without = []): array
 {
     $env = [
