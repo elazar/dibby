@@ -7,12 +7,12 @@ use DateTimeImmutable;
 class TransactionSummaryRow
 {
     public function __construct(
-        private DateTimeImmutable $date,
+        private ?DateTimeImmutable $date,
         private int $count,
         private float $total,
     ) { }
 
-    public function getDate(): DateTimeImmutable
+    public function getDate(): ?DateTimeImmutable
     {
         return $this->date;
     }

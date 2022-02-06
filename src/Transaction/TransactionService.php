@@ -112,15 +112,15 @@ class TransactionService
     {
         $map = new class extends SplObjectStorage {
             public function getHash(object $o): string {
-                /** @var DateTimeImmutable $o */
-                return $o->format('Ymd');
+                return $o instanceof DateTimeImmutable ? $o->format('Ymd') : spl_object_hash($o);
             }
         };
+        $null = new \stdClass;
 
         $byDate = array_reduce(
             $transactions,
-            function ($map, Transaction $transaction) {
-                $date  = $transaction->getDate();
+            function ($map, Transaction $transaction) use ($null) {
+                $date = $transaction->getDate() ?: $null;
                 if (!isset($map[$date])) {
                     $map[$date] = new ArrayObject;
                 }
@@ -142,12 +142,26 @@ class TransactionService
                     $dateTransactions->getArrayCopy(),
                 )
             );
-            $rows[] = new TransactionSummaryRow($date, $count, $total);
+            $rows[] = new TransactionSummaryRow($date === $null ? null : $date, $count, $total);
             $summaryCount += $count;
             $summaryTotal += $total;
         }
 
-        usort($rows, fn(TransactionSummaryRow $a, TransactionSummaryRow $b): int => $b->getDate() <=> $a->getDate());
+        usort(
+            $rows,
+            function (
+                TransactionSummaryRow $a,
+                TransactionSummaryRow $b,
+            ): int {
+                if ($a->getDate() === null) {
+                    return -1;
+                }
+                if ($b->getDate() === null) {
+                    return 1;
+                }
+                return $b->getDate() <=> $a->getDate();
+            }
+        );
 
         return new TransactionSummary($rows, $summaryCount, $summaryTotal);
     }
