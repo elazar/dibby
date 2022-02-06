@@ -13,13 +13,12 @@
 
 <h1 class="center">Transactions</h1>
 
-<?php foreach ($this->transactionsByDate($transactions) as $date => $transactionsForDate): ?>
+<?php foreach ($transactions as $transaction): ?>
 <section>
-  <h2 class="center"><?= $date ?></h2>
-  <?php foreach ($transactionsForDate as $transaction): ?>
   <article>
     <a class="edit" href="<?= $this->route('edit_transaction', ['transactionId' => $transaction->getId()]) ?>">Edit</a>
     <strong><?= number_format($transaction->getAmount(), 2) ?></strong><br>
+    <?= $this->formatDate($transaction->getDate()) ?><br>
     <?php if ($transaction->getDebitAccount()->getId() === $account->getId()): ?>
         <?php $factor = 1; ?>
     To: <a href="<?= $this->route('get_account_summary', ['accountId' => $transaction->getCreditAccount()->getId()]) ?>">
@@ -38,7 +37,6 @@
     <br>
     Balance: <?= number_format($balance, 2) ?>
   </article>
-    <?php $balance += $factor * $transaction->getAmount(); ?>
-  <?php endforeach; ?>
+  <?php $balance += $factor * $transaction->getAmount(); ?>
 </section>
 <?php endforeach; ?>
