@@ -9,6 +9,12 @@
 
 <h1 class="center">Accounts</h1>
 
+<?php if (count($accounts) === 0): ?>
+<div class="center">
+  <p>Looks like you don't have any accounts yet.</p>
+  <p>They'll be created automatically when you <a href="<?= $this->route('add_transaction') ?>">create a transaction</a>!</p>
+</div>
+<?php else: ?>
 <table role="grid">
   <thead>
     <tr>
@@ -17,7 +23,7 @@
     </tr>
   </thead>
   <tbody>
-<?php foreach ($accounts as $account): ?>
+  <?php foreach ($accounts as $account): ?>
     <tr>
       <td><?= $this->e($account->getName()) ?></td>
       <td class="right">
@@ -27,6 +33,7 @@
         <a href="<?= $this->route('edit_account', ['accountId' => $account->getId()]) ?>">Edit</a>
       </td>
     </tr>
-<?php endforeach; ?>
+  <?php endforeach; ?>
   </tbody>
 </table>
+<?php endif; ?>

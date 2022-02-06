@@ -6,6 +6,7 @@ use DateTimeImmutable;
 use Elazar\Dibby\Transaction\{
     TransactionCriteria,
     TransactionRepository,
+    TransactionService,
 };
 use Psr\Http\Message\{
     ResponseInterface,
@@ -16,6 +17,7 @@ class TransactionsController
 {
     public function __construct(
         private TransactionRepository $transactionRepository,
+        private TransactionService $transactionService,
         private ResponseGenerator $responseGenerator,
     ) { }
 
@@ -33,9 +35,11 @@ class TransactionsController
         }
         $criteria = TransactionCriteria::fromArray($params);
         $transactions = $this->transactionRepository->getTransactions($criteria);
+        $summary = $this->transactionService->getSummary($transactions);
 
         $data = [
             'transactions' => $transactions,
+            'summary' => $summary,
         ];
         return $this->responseGenerator->render($request, 'transactions', $data);
     }

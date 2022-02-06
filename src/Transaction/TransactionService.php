@@ -2,6 +2,7 @@
 
 namespace Elazar\Dibby\Transaction;
 
+use ArrayObject;
 use DateTimeImmutable;
 use Elazar\Dibby\{
     Account\Account,
@@ -9,6 +10,7 @@ use Elazar\Dibby\{
     Exception,
 };
 use Psr\Log\LoggerInterface;
+use SplObjectStorage;
 
 class TransactionService
 {
@@ -101,6 +103,53 @@ class TransactionService
             throw Exception::invalidInput('No criteria provided to filter transactions');
         }
         return $this->transactionRepository->getTransactions($criteria);
+    }
+
+    /**
+     * @param Transaction[] $transactions
+     */
+    public function getSummary(array $transactions): TransactionSummary
+    {
+        $map = new class extends SplObjectStorage {
+            public function getHash(object $o): string {
+                /** @var DateTimeImmutable $o */
+                return $o->format('Ymd');
+            }
+        };
+
+        $byDate = array_reduce(
+            $transactions,
+            function ($map, Transaction $transaction) {
+                $date  = $transaction->getDate();
+                if (!isset($map[$date])) {
+                    $map[$date] = new ArrayObject;
+                }
+                $map[$date]->append($transaction);
+                return $map;
+            },
+            $map,
+        );
+
+        $rows = [];
+        $summaryCount = 0;
+        $summaryTotal = 0.0;
+        foreach ($byDate as $date) {
+            $dateTransactions = $map[$date];
+            $count = count($dateTransactions);
+            $total = array_sum(
+                array_map(
+                    fn(Transaction $transaction): float => $transaction->getAmount(),
+                    $dateTransactions->getArrayCopy(),
+                )
+            );
+            $rows[] = new TransactionSummaryRow($date, $count, $total);
+            $summaryCount += $count;
+            $summaryTotal += $total;
+        }
+
+        usort($rows, fn(TransactionSummaryRow $a, TransactionSummaryRow $b): int => $b->getDate() <=> $a->getDate());
+
+        return new TransactionSummary($rows, $summaryCount, $summaryTotal);
     }
 
     private function deleteAccountIfEmpty(string $accountId): void

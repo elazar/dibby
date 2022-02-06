@@ -73,3 +73,9 @@ nav ul.subnavigation li:not(:first-child)::before {
 a.edit {
   float: right;
 }
+
+table.small {
+  margin-left: auto;
+  margin-right: auto;
+  width: fit-content;
+}

@@ -67,9 +67,10 @@ use Elazar\Dibby\Jwt\{
 };
 
 use Elazar\Dibby\Template\{
+    PlatesAmountExtension,
+    PlatesDateExtension,
     PlatesRouteExtension,
     PlatesTemplateEngine,
-    PlatesTransactionExtension,
     TemplateEngine,
 };
 
@@ -224,14 +225,16 @@ class PimpleServiceProvider implements ServiceProviderInterface
         $pimple[RouteConfiguration::class] = fn() => new RouteConfiguration;
 
         // Template engine
+        $pimple[PlatesAmountExtension::class] = fn($c) => new PlatesAmountExtension;
+        $pimple[PlatesDateExtension::class] = fn($c) => new PlatesDateExtension;
         $pimple[PlatesRouteExtension::class] = fn($c) => new PlatesRouteExtension(
             $c[RouteConfiguration::class],
         );
-        $pimple[PlatesTransactionExtension::class] = fn($c) => new PlatesTransactionExtension;
         $pimple[PlatesEngine::class] = function ($c) {
             $engine = new PlatesEngine(__DIR__ . '/../templates');
+            $engine->loadExtension($c[PlatesAmountExtension::class]);
+            $engine->loadExtension($c[PlatesDateExtension::class]);
             $engine->loadExtension($c[PlatesRouteExtension::class]);
-            $engine->loadExtension($c[PlatesTransactionExtension::class]);
             return $engine;
         };
         $pimple[PlatesTemplateEngine::class] = fn($c) => new PlatesTemplateEngine(
@@ -394,6 +397,7 @@ class PimpleServiceProvider implements ServiceProviderInterface
         );
         $pimple[TransactionsController::class] = fn($c) => new TransactionsController(
             $c[TransactionRepository::class],
+            $c[TransactionService::class],
             $c[ResponseGenerator::class],
         );
         $pimple[TemplatesController::class] = fn($c) => new TemplatesController(
