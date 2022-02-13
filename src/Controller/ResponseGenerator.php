@@ -26,9 +26,6 @@ class ResponseGenerator
         private JwtResponseTransformer $jwtResponseTransformer,
     ) { }
 
-    /**
-     * @param array<string, mixed> $data
-     */
     public function render(
         ServerRequestInterface $request,
         string $template,

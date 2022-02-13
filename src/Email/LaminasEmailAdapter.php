@@ -51,7 +51,6 @@ class LaminasEmailAdapter implements EmailAdapter
         $message->setBody($body);
 
         $headers = $message->getHeaders();
-        /** @var ContentType|false */
         $contentType = $headers->get('Content-Type');
         if ($contentType === false) {
             $contentType = new ContentType;

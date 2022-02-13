@@ -24,7 +24,6 @@ class DoctrineAccountRepository implements AccountRepository
      */
     public function persistAccount(Account $account): Account
     {
-        /** @var string */
         $accountName = $account->getName();
         $existing = $this->getAccountByName($accountName);
         if ($existing->getId() !== null && $account->getId() !== $existing->getId()) {
@@ -74,10 +73,8 @@ class DoctrineAccountRepository implements AccountRepository
                     name
                 EOS
             );
-            /** @var Account[] */
             $accounts = [];
             while (
-                /** @var array{id: string, name: string} $row */
                 $row = $results->fetchAssociative()
             ) {
                 $accounts[] = Account::fromArray($row);
@@ -111,7 +108,6 @@ class DoctrineAccountRepository implements AccountRepository
             $connection = $this->connectionFactory->getReadConnection();
             $column = $connection->quoteIdentifier($field);
             $table = $connection->quoteIdentifier(self::TABLE);
-            /** @var array<string, string> */
             $data = $connection->fetchAssociative(
                 <<<EOS
                 SELECT

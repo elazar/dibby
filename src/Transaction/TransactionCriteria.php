@@ -92,9 +92,6 @@ class TransactionCriteria implements \JsonSerializable
         return $this->with('dateEnd', $dateEnd);
     }
 
-    /**
-     * @return array<string, string|float>
-     */
     public function toArray(): array
     {
         return array_filter([
@@ -108,9 +105,6 @@ class TransactionCriteria implements \JsonSerializable
         ]);
     }
 
-    /**
-     * @return array<string, string|float>
-     */
     public function jsonSerialize(): array
     {
         return $this->toArray();
@@ -121,9 +115,6 @@ class TransactionCriteria implements \JsonSerializable
         return count($this->toArray()) === 0;
     }
 
-    /**
-     * @param array<string, string> $data
-     */
     public static function fromArray(array $data): self
     {
         $criteria = new self;

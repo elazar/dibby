@@ -39,7 +39,6 @@
     },
     "require-dev": {
         "pestphp/pest": "^1.20",
-        "phpstan/phpstan": "^1.2",
         "symfony/css-selector": "^6.0",
         "symfony/dom-crawler": "^6.0"
     },

@@ -20,9 +20,6 @@ class TransactionService
         private LoggerInterface $logger,
     ) { }
 
-    /**
-     * @param array<string, string> $data
-     */
     public function fromArray(array $data): Transaction
     {
         if (!isset($data['amount'])) {
@@ -83,11 +80,8 @@ class TransactionService
 
     public function deleteTransaction(Transaction $transaction): void
     {
-        /** @var string $transactionId */
         $transactionId = $transaction->getId();
-        /** @var string $debitAccountId */
         $debitAccountId = $transaction->getDebitAccount()->getId();
-        /** @var string $creditAccountId */
         $creditAccountId = $transaction->getCreditAccount()->getId();
         $this->transactionRepository->deleteTransactionById($transactionId);
         $this->deleteAccountIfEmpty($debitAccountId);

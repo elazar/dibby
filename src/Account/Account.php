@@ -32,9 +32,7 @@ class Account
     {
         return $this->with('id', $id);
     }
-    /**
-     * @param array<string, string> $data
-     */
+
     public static function fromArray(array $data): self
     {
         $account = new self((string) $data['name']);
@@ -46,9 +44,6 @@ class Account
         return $account;
     }
 
-    /**
-     * @return array{id?: non-empty-string, name?: non-empty-string}
-     */
     public function toArray(): array
     {
         return array_filter([

@@ -81,9 +81,6 @@ class Transaction
         return $this->with('description', $description);
     }
 
-    /**
-     * @return array<string, float|string|bool|null>
-     */
     public function toArray(): array
     {
         return [

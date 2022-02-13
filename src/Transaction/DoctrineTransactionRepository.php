@@ -39,16 +39,6 @@ class DoctrineTransactionRepository implements TransactionRepository
                 EOS,
                 [$transactionId],
             );
-            /**
-             * @var false|array{
-             *     debit_account_id: string,
-             *     credit_account_id: string,
-             *     amount: float,
-             *     date: string|DateTimeImmutable|null,
-             *     id: string,
-             *     description: string
-             *   } $data
-             */
             $data = $result->fetchAssociative();
             if ($data === false) {
                 throw Exception::transactionNotFound($transactionId);
@@ -112,16 +102,6 @@ class DoctrineTransactionRepository implements TransactionRepository
             $sql->orderBy('date', 'desc nulls first');
             $result = $sql->executeQuery();
             $transactions = [];
-            /**
-             * @var array{
-             *     debit_account_id: string,
-             *     credit_account_id: string,
-             *     amount: float,
-             *     date: string|DateTimeImmutable|null,
-             *     id: string,
-             *     description: string
-             *   } $row
-             */
             foreach ($result->iterateAssociative() as $row) {
                 $transactions[] = $this->fromArray($row);
             }
@@ -164,16 +144,6 @@ class DoctrineTransactionRepository implements TransactionRepository
         }
     }
 
-    /**
-     * @param array{
-     *     debit_account_id: string,
-     *     credit_account_id: string,
-     *     amount: float,
-     *     date: string|DateTimeImmutable|null,
-     *     id: string,
-     *     description: string
-     *   } $data
-     */
     private function fromArray(array $data): Transaction
     {
         $debitAccount = $this->accountRepository->getAccountById($data['debit_account_id']);
@@ -224,7 +194,6 @@ class DoctrineTransactionRepository implements TransactionRepository
         try {
             $connection = $this->connectionFactory->getReadConnection();
             $table = $connection->quoteIdentifier(self::TABLE);
-            /** @var int|false $result */
             $result = $connection->fetchOne(
                 <<<EOS
                 SELECT COUNT(*)

@@ -75,10 +75,8 @@ class DoctrineUserRepository implements UserRepository
                     name
                 EOS
             );
-            /** @var User[] */
             $users = [];
             while (
-                /** @var array<string, string> $row */
                 $row = $results->fetchAssociative()
             ) {
                 $users[] = User::fromArray($row);
@@ -108,7 +106,6 @@ class DoctrineUserRepository implements UserRepository
             $connection = $this->connectionFactory->getReadConnection();
             $table = $connection->quoteIdentifier(self::TABLE);
             $column = $connection->quoteIdentifier($field);
-            /** @var string[]|false */
             $data = $connection->fetchAssociative(
                 <<<EOS
                 SELECT

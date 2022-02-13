@@ -6,30 +6,19 @@ use Elazar\Dibby\Database\DatabaseConfiguration;
 
 class PhpArrayConfigurationFactory implements ConfigurationFactory
 {
-    /**
-     * @param array<string, string|array<string, string>> $settings
-     */
     public function __construct(
         private array $settings,
     ) { }
 
     public function getConfiguration(): Configuration
     {
-        /** @var array<string, array<string, string>|string> $db */
         $db = $this->settings['db'];
-        /** @var array<string, string> $read */
         $read = $db['read'];
-        /** @var array<string, string> $write */
         $write = $db['write'];
-        /** @var string */
         $baseUrl = $this->settings['base_url'];
-        /** @var string */
         $fromEmail = $this->settings['from_email'];
-        /** @var string */
         $resetTokenTtl = $this->settings['reset_token_ttl'];
-        /** @var array<string, string> */
         $session = $this->settings['session'];
-        /** @var array<string, string> */
         $smtp = $this->settings['smtp'];
 
         $databaseReadConfiguration = $this->getDatabaseConfiguration($read);
@@ -53,9 +42,6 @@ class PhpArrayConfigurationFactory implements ConfigurationFactory
         );
     }
 
-    /**
-     * @param array<string, string> $settings
-     */
     private function getDatabaseConfiguration(array $settings): DatabaseConfiguration
     {
         return new DatabaseConfiguration(

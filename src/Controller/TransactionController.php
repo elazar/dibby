@@ -23,12 +23,8 @@ class TransactionController
         private TransactionRepository $transactionRepository,
     ) { }
 
-    /**
-     * @param array<string, string> $args
-     */
     public function __invoke(ServerRequestInterface $request, array $args): ResponseInterface
     {
-        /** @var ?\Elazar\Dibby\User\User $user */
         $user = $request->getAttribute('user');
         if ($user === null) {
             return $this->responseGenerator->redirect('get_login');

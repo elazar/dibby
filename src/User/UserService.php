@@ -33,7 +33,6 @@ class UserService
         if (!filter_var($user->getEmail(), \FILTER_VALIDATE_EMAIL)) {
             throw Exception::invalidInput('E-mail is invalid');
         }
-        /** @var string */
         $password = $user->getPassword();
         $passwordHash = $this->passwordHasher->getHash($password);
         $user = $user->withPasswordHash($passwordHash);
@@ -76,7 +75,6 @@ class UserService
             return null;
         }
 
-        /** @var string */
         $userId = $user->getId();
         $resetToken = $this->resetTokenGenerator->generateToken();
 

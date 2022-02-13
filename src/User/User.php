@@ -90,9 +90,6 @@ class User
         return $this->with('resetTokenExpiration', $resetTokenExpiration);
     }
 
-    /**
-     * @param array<string, string> $data
-     */
     public static function fromArray(array $data): self
     {
         $user = new self((string) $data['email'] ?: '');
@@ -126,9 +123,6 @@ class User
         return $user;
     }
 
-    /**
-     * @return array<string, string>
-     */
     public function toArray(): array
     {
         return array_filter([

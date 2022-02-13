@@ -151,9 +151,6 @@ use Psr\Log\LoggerInterface;
 
 class PimpleServiceProvider implements ServiceProviderInterface
 {
-    /**
-     * @return void
-     */
     public function register(Container $pimple)
     {
         // PSR-7 implementation

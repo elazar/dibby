@@ -24,14 +24,8 @@ use League\Route\Router;
 
 class RouteConfiguration
 {
-    /**
-     * @var array<array<string>>
-     */
     private array $routes;
 
-    /**
-     * @var array<string, string>
-     */
     private ?array $namePathMap = null;
 
     public function __construct()
@@ -65,9 +59,6 @@ class RouteConfiguration
         ];
     }
 
-    /**
-     * @param array<string, string>|null $parameters
-     */
     public function getPath(string $name, ?array $parameters = null): string
     {
         if ($this->namePathMap === null) {
