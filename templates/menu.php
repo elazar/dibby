@@ -14,6 +14,7 @@ $this->layout('layout');
         <ul>
           <li><a href="<?= $this->route('get_transactions') ?>">List Transactions</a></li>
           <li><a href="<?= $this->route('add_transaction') ?>">Add Transaction</a></li>
+          <li><a href="<?= $this->route('get_reconcile') ?>">Reconcile</a></li>
         </ul>
       </li>
       <li>

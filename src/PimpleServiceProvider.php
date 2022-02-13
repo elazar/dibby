@@ -34,6 +34,7 @@ use Elazar\Dibby\Controller\{
     LoginController,
     MenuController,
     PasswordController,
+    ReconcileController,
     RegisterController,
     ResetController,
     ResponseGenerator,
@@ -43,6 +44,8 @@ use Elazar\Dibby\Controller\{
     UserController,
     UsersController,
 };
+
+use Elazar\Dibby\Csv\ChaseCsvParser;
 
 use Elazar\Dibby\Database\{
     DatabaseConnectionFactory,
@@ -64,6 +67,11 @@ use Elazar\Dibby\Jwt\{
     JwtRequestTransformer,
     JwtResponseTransformer,
     UserJwtRequestTransformer,
+};
+
+use Elazar\Dibby\Reconciler\{
+    CsvReconciler,
+    CsvReconcilerService,
 };
 
 use Elazar\Dibby\Template\{
@@ -339,6 +347,15 @@ class PimpleServiceProvider implements ServiceProviderInterface
             $c[LoggerInterface::class],
         );
 
+        // Reconciler
+        $pimple[ChaseCsvParser::class] = fn($c) => new ChaseCsvParser;
+        $pimple[CsvReconciler::class] = fn($c) => new CsvReconciler;
+        $pimple[CsvReconcilerService::class] = fn($c) => new CsvReconcilerService(
+            $c[ChaseCsvParser::class],
+            $c[CsvReconciler::class],
+            $c[TransactionRepository::class],
+        );
+
         // Controllers
         $pimple[IndexController::class] = fn($c) => new IndexController(
             $c[ResponseGenerator::class],
@@ -415,6 +432,11 @@ class PimpleServiceProvider implements ServiceProviderInterface
             $c[UserRepository::class],
             $c[UserService::class],
             $c[PasswordGenerator::class],
+        );
+        $pimple[ReconcileController::class] = fn($c) => new ReconcileController(
+            $c[CsvReconcilerService::class],
+            $c[AccountRepository::class],
+            $c[ResponseGenerator::class],
         );
     }
 }

@@ -33,11 +33,7 @@ $title = (isset($id) ? 'Edit' : 'Add') . ' Transaction';
   <label for="amount">Amount</label>
   <input id="amount" name="amount" type="number" value="<?= $this->e($amount ?? '') ?>" step="0.01" required autofocus placeholder="e.g. 1.99">
 
-  <datalist id="accounts">
-    <?php foreach ($accounts as $account): ?>
-    <option value="<?= $this->e($account->getName()) ?>">
-    <?php endforeach; ?>
-  </datalist>
+  <?php $this->insert('accounts-datalist', ['accounts' => $accounts]); ?>
 
   <label for="debit_account">From Account</label>
   <input id="debit_account" name="debit_account" list="accounts" type="text" value="<?= $this->e($debitAccount ?? '') ?>" placeholder="e.g. Checking" required>

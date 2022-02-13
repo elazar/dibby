@@ -8,7 +8,7 @@ use Elazar\Dibby\{
     Immutable,
 };
 
-class Transaction
+class Transaction implements TransactionInterface
 {
     use Immutable;
 

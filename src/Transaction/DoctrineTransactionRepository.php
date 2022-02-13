@@ -63,17 +63,18 @@ class DoctrineTransactionRepository implements TransactionRepository
             $sql = $connection->createQueryBuilder()
                               ->select('*')
                               ->from(self::TABLE);
+            $where = [];
             if ($description = $criteria->getDescription()) {
-                $sql->where('description ILIKE :description')
-                    ->setParameter('description', "%$description%");
+                $where[] = 'description ILIKE :description';
+                $sql->setParameter('description', "%$description%");
             }
             if ($amountStart = $criteria->getAmountStart()) {
-                $sql->where('amount >= :amountStart')
-                    ->setParameter('amountStart', $amountStart);
+                $where[] = 'amount >= :amountStart';
+                $sql->setParameter('amountStart', $amountStart);
             }
             if ($amountEnd = $criteria->getAmountEnd()) {
-                $sql->where('amount <= :amountEnd')
-                    ->setParameter('amountEnd', $amountEnd);
+                $where[] = 'amount <= :amountEnd';
+                $sql->setParameter('amountEnd', $amountEnd);
             }
             if ($debitAccountId = $criteria->getDebitAccountId()) {
                 $sql->setParameter('debitAccountId', $debitAccountId);
@@ -82,23 +83,25 @@ class DoctrineTransactionRepository implements TransactionRepository
                 $sql->setParameter('creditAccountId', $creditAccountId);
             }
             if ($debitAccountId) {
-                $sql->where('debit_account_id = :debitAccountId');
+                $clause = 'debit_account_id = :debitAccountId';
                 if ($debitAccountId === $creditAccountId) {
-                    $sql->orWhere('credit_account_id = :creditAccountId');
+                    $clause .= ' OR credit_account_id = :creditAccountId';
                 }
+                $where[] = $clause;
             }
             if ($creditAccountId && $creditAccountId !== $debitAccountId) {
-                $sql->where('credit_account_id = :creditAccountId');
+                $where[] = 'credit_account_id = :creditAccountId';
             }
             $date = $connection->quoteIdentifier('date');
             if ($dateStart = $criteria->getDateStart()) {
-                $sql->where("$date >= :dateStart or $date is null")
-                    ->setParameter('dateStart', $dateStart->format('Y-m-d'));
+                $where[] = "$date >= :dateStart or $date is null";
+                $sql->setParameter('dateStart', $dateStart->format('Y-m-d'));
             }
             if ($dateEnd = $criteria->getDateEnd()) {
-                $sql->where("$date <= :dateEnd or $date is null")
-                    ->setParameter('dateEnd', $dateEnd->format('Y-m-d'));
+                $where[] = "$date <= :dateEnd or $date is null";
+                $sql->setParameter('dateEnd', $dateEnd->format('Y-m-d'));
             }
+            $sql->where($sql->expr()->and(...$where));
             $sql->orderBy('date', 'desc nulls first');
             $result = $sql->executeQuery();
             $transactions = [];
