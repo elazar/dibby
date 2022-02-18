@@ -81,6 +81,11 @@ class Transaction implements TransactionInterface
         return $this->with('description', $description);
     }
 
+    public function isPending(): bool
+    {
+        return $this->date === null;
+    }
+
     public function toArray(): array
     {
         return [

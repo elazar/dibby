@@ -4,7 +4,7 @@ namespace Elazar\Dibby\Controller;
 
 use Elazar\Dibby\{
     Account\AccountRepository,
-    Reconciler\CsvReconcilerService,
+    Reconciler\ImporterReconcilerService,
 };
 
 use Psr\Http\Message\{
@@ -15,7 +15,7 @@ use Psr\Http\Message\{
 class ReconcileController
 {
     public function __construct(
-        private CsvReconcilerService $csvReconcilerService,
+        private ImporterReconcilerService $importerReconcilerService,
         private AccountRepository $accountRepository,
         private ResponseGenerator $responseGenerator,
     ) { }
@@ -41,7 +41,7 @@ class ReconcileController
                 $data['account'] = $body['account'];
 
                 $account = $this->accountRepository->getAccountByName($body['account']);
-                $summary = $this->csvReconcilerService->reconcile($csv, $account->getId());
+                $summary = $this->importerReconcilerService->reconcile($data, $account->getId());
                 $data['summary'] = $summary;
             }
         }

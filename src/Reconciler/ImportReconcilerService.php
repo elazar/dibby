@@ -3,13 +3,13 @@
 namespace Elazar\Dibby\Reconciler;
 
 use DateTimeImmutable;
-use Elazar\Dibby\Csv\{
-    ChaseCsvParser,
-    CsvTransaction,
+use Elazar\Dibby\Importer\{
+    Importer,
+    ImportedTransaction,
 };
 use Elazar\Dibby\Reconciler\{
-    CsvReconciler,
-    CsvReconcilerSummary,
+    ImportReconciler,
+    ImportReconcilerSummary,
 };
 use Elazar\Dibby\Transaction\{
     Transaction,
@@ -20,15 +20,15 @@ use Elazar\Dibby\Transaction\{
 class CsvReconcilerService
 {
     public function __construct(
-        private ChaseCsvParser $csvParser,
-        private CsvReconciler $csvReconciler,
+        private Importer $importer,
+        private ImportReconciler $importReconciler,
         private TransactionRepository $transactionRepository,
     ) { }
 
-    public function reconcile(string $csv, string $accountId): CsvReconcilerSummary
+    public function reconcile(string $data, string $accountId): CsvReconcilerSummary
     {
-        $csvTransactions = $this->csvParser->parseString($csv);
-        $dateStart = $this->getEarliestTransactionDate($csvTransactions);
+        $importTransactions = $this->importer->import($data);
+        $dateStart = $this->getEarliestTransactionDate($importTransactions);
         $criteria = new TransactionCriteria(
             dateStart: $dateStart,
             debitAccountId: $accountId,
@@ -40,7 +40,7 @@ class CsvReconcilerService
           $dibbyTransactions,
           fn(Transaction $transaction): bool => $transaction->getDate() !== null,
         );
-        return $this->csvReconciler->reconcile($dibbyTransactions, $csvTransactions);
+        return $this->importReconciler->reconcile($dibbyTransactions, $importTransactions);
     }
 
     /**
@@ -52,7 +52,7 @@ class CsvReconcilerService
             $transactions,
             function (
                 ?DateTimeImmutable $earliestDate,
-                CsvTransaction $transaction,
+                ImportedTransaction $transaction,
             ): DateTimeImmutable {
                 if ($earliestDate === null) {
                     return $transaction->getDate();

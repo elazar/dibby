@@ -1,16 +1,16 @@
 <?php
 
-namespace Elazar\Dibby\Csv;
+namespace Elazar\Dibby\Importer;
 
 use Elazar\Dibby\Transaction\TransactionInterface;
 
 use DateTimeImmutable;
 
-class CsvTransaction implements TransactionInterface
+class ImportedTransaction implements TransactionInterface
 {
     public function __construct(
         private float $amount,
-        private DateTimeImmutable $date,
+        private ?DateTimeImmutable $date,
         private string $description,
     ) { }
 
@@ -27,5 +27,10 @@ class CsvTransaction implements TransactionInterface
     public function getDescription(): ?string
     {
         return $this->description;
+    }
+
+    public function isPending(): bool
+    {
+        return $this->date === null;
     }
 }

@@ -3,34 +3,34 @@
 namespace Elazar\Dibby\Reconciler;
 
 use Elazar\Dibby\{
-    Csv\CsvTransaction,
+    Importer\ImportedTransaction,
     Transaction\Transaction as DibbyTransaction,
     Transaction\TransactionInterface,
 };
 
-class CsvReconciler
+class ImporterReconciler
 {
     /**
      * @param DibbyTransaction[] $dibbyTransactions
-     * @param CsvTransaction[] $csvTransactions
+     * @param ImportedTransaction[] $importedTransactions
      */
     public function reconcile(
         array $dibbyTransactions,
-        array $csvTransactions,
-    ): CsvReconcilerSummary {
+        array $importedTransactions,
+    ): ReconcilerSummary {
         $dibbyByAmount = $this->getTransactionsByAmount($dibbyTransactions);
-        $csvByAmount = $this->getTransactionsByAmount($csvTransactions);
+        $importedByAmount = $this->getTransactionsByAmount($importedTransactions);
 
-        $csvTransactionsMissingFromDibby = $this->getMissingTransactions($csvByAmount, $dibbyByAmount);
-        $dibbyTransactionsMissingFromCsv = $this->getMissingTransactions($dibbyByAmount, $csvByAmount);
+        $importedTransactionsMissingFromDibby = $this->getMissingTransactions($importedByAmount, $dibbyByAmount);
+        $dibbyTransactionsMissingFromImport = $this->getMissingTransactions($dibbyByAmount, $importedByAmount);
 
-        $csvTransactionsWithDifferingCounts = $this->getTransactionsWithDifferingCounts($csvByAmount, $dibbyByAmount);
-        $dibbyTransactionsWithDifferingCounts = $this->getTransactionsWithDifferingCounts($dibbyByAmount, $csvByAmount);
+        $importedTransactionsWithDifferingCounts = $this->getTransactionsWithDifferingCounts($importedByAmount, $dibbyByAmount);
+        $dibbyTransactionsWithDifferingCounts = $this->getTransactionsWithDifferingCounts($dibbyByAmount, $importedByAmount);
 
-        return new CsvReconcilerSummary(
-            $csvTransactionsMissingFromDibby,
-            $dibbyTransactionsMissingFromCsv,
-            $csvTransactionsWithDifferingCounts,
+        return new ReconcilerSummary(
+            $importedTransactionsMissingFromDibby,
+            $dibbyTransactionsMissingFromImport,
+            $importedTransactionsWithDifferingCounts,
             $dibbyTransactionsWithDifferingCounts,
         );
     }

@@ -11,4 +11,6 @@ interface TransactionInterface
     public function getDate(): ?DateTimeImmutable;
 
     public function getDescription(): ?string;
+
+    public function isPending(): bool;
 }
