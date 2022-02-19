@@ -6,18 +6,19 @@ use DateTimeImmutable;
 
 class ChaseImporter implements Importer
 {
+    private DateTimeImmutable $now;
+
     public function __construct(
-        private DateTimeImmutable $now,
-    ) { }
+        DateTimeImmutable $now,
+    ) {
+        $this->now = $now->setTime(0, 0, 0, 0);
+    }
 
     /**
      * @return ImportedTransaction[]
      */
     public function import(string $data): array
     {
-        /**
-         * @var string[] $lines
-         */
         $lines = preg_split('/[\r\n]+/', $data);
 
         // Remove trailing empty string
@@ -31,6 +32,7 @@ class ChaseImporter implements Importer
         $transactions = array_map(
             function (array $row): ImportedTransaction {
                 $date = DateTimeImmutable::createFromFormat('m/d/Y', $row[1]) ?: null;
+                $date = $date->setTime(0, 0, 0, 0);
                 $amount = (float) $row[3];
                 $description = preg_replace('/\s{2,}/', ' ', $row[2]);
                 return new ImportedTransaction(
@@ -48,7 +50,11 @@ class ChaseImporter implements Importer
             $transactions,
             function (ImportedTransaction $transaction): bool {
                 $date = $transaction->getDate();
-                return $date === null || $date->diff($this->now)->d === 0;
+                if ($date === null) {
+                    return false;
+                }
+                $diff = $date->diff($this->now);
+                return $diff->y > 0 || $diff->m > 0 || $diff->d > 0;
             },
         );
 

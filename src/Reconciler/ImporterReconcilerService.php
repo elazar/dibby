@@ -29,8 +29,10 @@ class ImporterReconcilerService
     {
         $importTransactions = $this->importer->import($data);
         $dateStart = $this->getEarliestTransactionDate($importTransactions);
+        $dateEnd = $this->getLatestTransactionDate($importTransactions);
         $criteria = new TransactionCriteria(
             dateStart: $dateStart,
+            dateEnd: $dateEnd,
             debitAccountId: $accountId,
             creditAccountId: $accountId,
         );
@@ -38,7 +40,7 @@ class ImporterReconcilerService
         // Filter out pending transactions
         $dibbyTransactions = array_filter(
           $dibbyTransactions,
-          fn(Transaction $transaction): bool => $transaction->getDate() !== null,
+          fn(Transaction $transaction): bool => !$transaction->isPending(),
         );
         return $this->importerReconciler->reconcile($dibbyTransactions, $importTransactions);
     }
@@ -48,16 +50,40 @@ class ImporterReconcilerService
      */
     private function getEarliestTransactionDate(array $transactions): DateTimeImmutable
     {
+        return $this->compareTransactionDates(
+            $transactions,
+            fn($a, $b) => min($a, $b),
+        );
+    }
+
+    /**
+     * @param ImportedTransaction[] $transactions
+     */
+    private function getLatestTransactionDate(array $transactions): DateTimeImmutable
+    {
+        return $this->compareTransactionDates(
+            $transactions,
+            fn($a, $b) => max($a, $b),
+        );
+    }
+
+    /**
+     * @param ImportedTransaction[] $transactions
+     */
+    private function compareTransactionDates(
+        array $transactions,
+        callable $comparator,
+    ): DateTimeImmutable {
         return array_reduce(
             $transactions,
             function (
                 ?DateTimeImmutable $earliestDate,
                 ImportedTransaction $transaction,
-            ): DateTimeImmutable {
+            ) use ($comparator): DateTimeImmutable {
                 if ($earliestDate === null) {
                     return $transaction->getDate();
                 }
-                return min($earliestDate, $transaction->getDate());
+                return $comparator($earliestDate, $transaction->getDate());
             },
             null,
         );

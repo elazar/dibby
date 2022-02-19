@@ -5,13 +5,20 @@ use Elazar\Dibby\Importer\{
     ImportedTransaction,
 };
 
+function get_import_file($name): string
+{
+    return file_get_contents(__DIR__ . "/_files/$name");
+}
+
 beforeEach(function () {
-    $this->importer = new ChaseImporter(new DateTimeImmutable);
-    $this->data = file_get_contents(__DIR__ . '/_files/Chase9989_Activity_20220212.CSV');
+    $this->importer = new ChaseImporter(
+        new DateTimeImmutable('2022-02-18'),
+    );
 });
 
 it('parses a Chase export', function () {
-    $transactions = $this->importer->import($this->data);
+    $data = get_import_file('Chase9989_Activity_20220212.CSV');
+    $transactions = $this->importer->import($data);
 
     expect($transactions)
         ->toBeArray()
@@ -25,6 +32,17 @@ it('parses a Chase export', function () {
 });
 
 it('detects compatibility with a Chase export', function () {
-    $compatible = $this->importer->isCompatible($this->data);
+    $data = get_import_file('Chase9989_Activity_20220212.CSV');
+    $compatible = $this->importer->isCompatible($data);
     expect($compatible)->toBe(true);
+});
+
+it('excludes transactions dated today', function () {
+    $data = get_import_file('Chase9989_Activity_20220218.CSV');
+    $transactions = $this->importer->import($data);
+
+    expect($transactions)
+        ->toBeArray()
+        ->toHaveCount(247)
+        ->each->toBeInstanceOf(ImportedTransaction::class);
 });
