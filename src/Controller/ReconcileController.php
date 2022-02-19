@@ -35,13 +35,13 @@ class ReconcileController
             $files = $request->getUploadedFiles();
             if (count($files) > 0) {
                 $file = array_shift($files);
-                $csv = $file->getStream()->getContents();
+                $contents = $file->getStream()->getContents();
 
                 $body = (array) $request->getParsedBody();
                 $data['account'] = $body['account'];
 
                 $account = $this->accountRepository->getAccountByName($body['account']);
-                $summary = $this->importerReconcilerService->reconcile($data, $account->getId());
+                $summary = $this->importerReconcilerService->reconcile($contents, $account->getId());
                 $data['summary'] = $summary;
             }
         }

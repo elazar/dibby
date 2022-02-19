@@ -42,6 +42,16 @@ class ChaseImporter implements Importer
             $rows
         );
 
+        // Filter transactions with a date of today, which may show up as
+        // pending in the Chase web UI
+        $transactions = array_filter(
+            $transactions,
+            function (ImportedTransaction $transaction): bool {
+                $date = $transaction->getDate();
+                return $date === null || $date->diff($this->now)->d === 0;
+            },
+        );
+
         return $transactions;
     }
 

@@ -8,8 +8,8 @@ use Elazar\Dibby\Importer\{
     ImportedTransaction,
 };
 use Elazar\Dibby\Reconciler\{
-    ImportReconciler,
-    ImportReconcilerSummary,
+    ImporterReconciler,
+    ImporterReconcilerSummary,
 };
 use Elazar\Dibby\Transaction\{
     Transaction,
@@ -17,15 +17,15 @@ use Elazar\Dibby\Transaction\{
     TransactionRepository,
 };
 
-class CsvReconcilerService
+class ImporterReconcilerService
 {
     public function __construct(
         private Importer $importer,
-        private ImportReconciler $importReconciler,
+        private ImporterReconciler $importerReconciler,
         private TransactionRepository $transactionRepository,
     ) { }
 
-    public function reconcile(string $data, string $accountId): CsvReconcilerSummary
+    public function reconcile(string $data, string $accountId): ImporterReconcilerSummary
     {
         $importTransactions = $this->importer->import($data);
         $dateStart = $this->getEarliestTransactionDate($importTransactions);
@@ -40,11 +40,11 @@ class CsvReconcilerService
           $dibbyTransactions,
           fn(Transaction $transaction): bool => $transaction->getDate() !== null,
         );
-        return $this->importReconciler->reconcile($dibbyTransactions, $importTransactions);
+        return $this->importerReconciler->reconcile($dibbyTransactions, $importTransactions);
     }
 
     /**
-     * @param CsvTransaction[] $transactions
+     * @param ImportedTransaction[] $transactions
      */
     private function getEarliestTransactionDate(array $transactions): DateTimeImmutable
     {

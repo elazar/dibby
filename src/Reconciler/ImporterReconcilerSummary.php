@@ -3,13 +3,13 @@
 namespace Elazar\Dibby\Reconciler;
 
 use DateTimeImmutable;
-use Elazar\Dibby\Importer\ImportedTransaction;
 use Elazar\Dibby\{
+    Importer\ImportedTransaction,
     Transaction\Transaction as DibbyTransaction,
     Transaction\TransactionInterface,
 };
 
-class ReconcilerSummary
+class ImporterReconcilerSummary
 {
     /**
      * @param ImportedTransaction[] $importTransactionsMissingFromDibby

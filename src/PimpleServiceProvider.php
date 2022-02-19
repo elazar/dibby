@@ -70,8 +70,8 @@ use Elazar\Dibby\Jwt\{
 };
 
 use Elazar\Dibby\Reconciler\{
-    ImportReconciler,
-    ImportReconcilerService,
+    ImporterReconciler,
+    ImporterReconcilerService,
 };
 
 use Elazar\Dibby\Template\{

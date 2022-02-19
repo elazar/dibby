@@ -21,8 +21,8 @@ $title = 'Reconcile';
 
 <form method="post" action="<?= $this->route('post_reconcile') ?>" enctype="multipart/form-data">
 
-  <label for="upload">CSV File</label>
-  <input type="file" name="csv" required>
+  <label for="upload">File</label>
+  <input type="file" name="import" required>
 
   <?php $this->insert('accounts-datalist', ['accounts' => $accounts]); ?>
 
@@ -35,24 +35,24 @@ $title = 'Reconcile';
 
 <?php if (isset($summary)): ?>
 
-  <?php if (count($summary->getDibbyTransactionsMissingFromCsv())): ?>
+  <?php if (count($summary->getDibbyTransactionsMissingFromImport())): ?>
     <h2 class="center">Missing from Upload</h2>
-    <?php foreach ($summary->getDibbyTransactionsMissingFromCsv() as $dibbyTransaction): ?>
+    <?php foreach ($summary->getDibbyTransactionsMissingFromImport() as $dibbyTransaction): ?>
       <?php $this->insert('transaction-listing', ['transaction' => $dibbyTransaction]); ?>
     <?php endforeach; ?>
   <?php endif; ?>
 
-  <?php if (count($summary->getCsvTransactionsMissingFromDibby())): ?>
+  <?php if (count($summary->getImportTransactionsMissingFromDibby())): ?>
     <h2 class="center">Missing from Dibby</h2>
-    <?php foreach ($summary->getCsvTransactionsMissingFromDibby() as $csvTransaction): ?>
-      <?php $this->insert('csv-transaction-listing', ['transaction' => $csvTransaction]); ?>
+    <?php foreach ($summary->getImportTransactionsMissingFromDibby() as $importTransaction): ?>
+      <?php $this->insert('import-transaction-listing', ['transaction' => $importTransaction]); ?>
     <?php endforeach; ?>
   <?php endif; ?>
 
-  <?php if (count($summary->getCsvTransactionsWithDifferingCounts())): ?>
+  <?php if (count($summary->getImportTransactionsWithDifferingCounts())): ?>
     <h2 class="center">Different Count in Upload</h2>
-    <?php foreach ($summary->getCsvTransactionsWithDifferingCounts() as $csvTransaction): ?>
-      <?php $this->insert('csv-transaction-listing', ['transaction' => $csvTransaction]); ?>
+    <?php foreach ($summary->getImportTransactionsWithDifferingCounts() as $importTransaction): ?>
+      <?php $this->insert('import-transaction-listing', ['transaction' => $importTransaction]); ?>
     <?php endforeach; ?>
   <?php endif; ?>
 

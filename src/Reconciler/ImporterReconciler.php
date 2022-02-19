@@ -17,7 +17,7 @@ class ImporterReconciler
     public function reconcile(
         array $dibbyTransactions,
         array $importedTransactions,
-    ): ReconcilerSummary {
+    ): ImporterReconcilerSummary {
         $dibbyByAmount = $this->getTransactionsByAmount($dibbyTransactions);
         $importedByAmount = $this->getTransactionsByAmount($importedTransactions);
 
@@ -27,7 +27,7 @@ class ImporterReconciler
         $importedTransactionsWithDifferingCounts = $this->getTransactionsWithDifferingCounts($importedByAmount, $dibbyByAmount);
         $dibbyTransactionsWithDifferingCounts = $this->getTransactionsWithDifferingCounts($dibbyByAmount, $importedByAmount);
 
-        return new ReconcilerSummary(
+        return new ImporterReconcilerSummary(
             $importedTransactionsMissingFromDibby,
             $dibbyTransactionsMissingFromImport,
             $importedTransactionsWithDifferingCounts,
