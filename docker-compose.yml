@@ -20,6 +20,8 @@ services:
     working_dir: /app
     volumes:
       - .:/app
+      - ./docker/php/xdebug.ini:/usr/local/etc/php/conf.d/50_xdebug.ini
+      - ./docker/php/overrides.ini:/usr/local/etc/php/conf.d/99_overrides.ini
     entrypoint: /usr/local/sbin/php-fpm -F
 
   pgsql:
