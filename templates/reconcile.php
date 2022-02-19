@@ -63,4 +63,14 @@ $title = 'Reconcile';
     <?php endforeach; ?>
   <?php endif; ?>
 
+  <?php if (
+    empty($summary->getDibbyTransactionsMissingFromImport())
+    && empty($summary->getImportTransactionsMissingFromDibby())
+    && empty($summary->getImportTransactionsWithDifferingCounts())
+    && empty($summary->getDibbyTransactionsWithDifferentCounts())
+  ): ?>
+  <h2 class="center">All Good!</h2>
+  <p class="center">Congratulations, your account is reconciled!</p>
+  <?php endif; ?>
+
 <?php endif; ?>
