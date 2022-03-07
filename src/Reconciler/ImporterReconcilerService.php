@@ -14,6 +14,7 @@ use Elazar\Dibby\Reconciler\{
 use Elazar\Dibby\Transaction\{
     Transaction,
     TransactionCriteria,
+    TransactionInterface,
     TransactionRepository,
 };
 
@@ -28,20 +29,31 @@ class ImporterReconcilerService
     public function reconcile(string $data, string $accountId): ImporterReconcilerSummary
     {
         $importTransactions = $this->importer->import($data);
-        $dateStart = $this->getEarliestTransactionDate($importTransactions);
-        $dateEnd = $this->getLatestTransactionDate($importTransactions);
+        $importDateStart = $this->getEarliestTransactionDate($importTransactions);
+        $importDateEnd = $this->getLatestTransactionDate($importTransactions);
+
         $criteria = new TransactionCriteria(
-            dateStart: $dateStart,
-            dateEnd: $dateEnd,
+            dateStart: $importDateStart,
+            dateEnd: $importDateEnd,
             debitAccountId: $accountId,
             creditAccountId: $accountId,
         );
         $dibbyTransactions = $this->transactionRepository->getTransactions($criteria);
-        // Filter out pending transactions
         $dibbyTransactions = array_filter(
           $dibbyTransactions,
           fn(Transaction $transaction): bool => !$transaction->isPending(),
         );
+
+        $dibbyDateStart = $this->getEarliestTransactionDate($dibbyTransactions);
+        $dibbyDateEnd = $this->getLatestTransactionDate($dibbyTransactions);
+        $latestDateStart = max($importDateStart, $dibbyDateStart);
+        $earliestDateEnd = min($importDateEnd, $dibbyDateEnd);
+        $importTransactions = array_filter(
+            $importTransactions,
+            fn(ImportedTransaction $transaction): bool =>
+                $transaction->getDate() >= $latestDateStart && $transaction->getDate() <= $earliestDateEnd
+        );
+
         return $this->importerReconciler->reconcile($dibbyTransactions, $importTransactions);
     }
 
@@ -77,13 +89,12 @@ class ImporterReconcilerService
         return array_reduce(
             $transactions,
             function (
-                ?DateTimeImmutable $earliestDate,
-                ImportedTransaction $transaction,
+                ?DateTimeImmutable $date,
+                TransactionInterface $transaction,
             ) use ($comparator): DateTimeImmutable {
-                if ($earliestDate === null) {
-                    return $transaction->getDate();
-                }
-                return $comparator($earliestDate, $transaction->getDate());
+                return $date === null
+                    ? $transaction->getDate()
+                    : $comparator($date, $transaction->getDate());
             },
             null,
         );
