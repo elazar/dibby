@@ -99,67 +99,6 @@ class TransactionService
         return $this->transactionRepository->getTransactions($criteria);
     }
 
-    /**
-     * @param Transaction[] $transactions
-     */
-    public function getSummary(array $transactions): TransactionSummary
-    {
-        $map = new class extends SplObjectStorage {
-            public function getHash(object $o): string {
-                return $o instanceof DateTimeImmutable ? $o->format('Ymd') : spl_object_hash($o);
-            }
-        };
-        $null = new \stdClass;
-
-        $byDate = array_reduce(
-            $transactions,
-            function ($map, Transaction $transaction) use ($null) {
-                $date = $transaction->getDate() ?: $null;
-                if (!isset($map[$date])) {
-                    $map[$date] = new ArrayObject;
-                }
-                $map[$date]->append($transaction);
-                return $map;
-            },
-            $map,
-        );
-
-        $rows = [];
-        $summaryCount = 0;
-        $summaryTotal = 0.0;
-        foreach ($byDate as $date) {
-            $dateTransactions = $map[$date];
-            $count = count($dateTransactions);
-            $total = array_sum(
-                array_map(
-                    fn(Transaction $transaction): float => $transaction->getAmount(),
-                    $dateTransactions->getArrayCopy(),
-                )
-            );
-            $rows[] = new TransactionSummaryRow($date === $null ? null : $date, $count, $total);
-            $summaryCount += $count;
-            $summaryTotal += $total;
-        }
-
-        usort(
-            $rows,
-            function (
-                TransactionSummaryRow $a,
-                TransactionSummaryRow $b,
-            ): int {
-                if ($a->getDate() === null) {
-                    return -1;
-                }
-                if ($b->getDate() === null) {
-                    return 1;
-                }
-                return $b->getDate() <=> $a->getDate();
-            }
-        );
-
-        return new TransactionSummary($rows, $summaryCount, $summaryTotal);
-    }
-
     private function deleteAccountIfEmpty(string $accountId): void
     {
         $transactionCount = $this->transactionRepository->getAccountTransactionCount($accountId);

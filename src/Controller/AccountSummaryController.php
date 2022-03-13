@@ -37,11 +37,9 @@ class AccountSummaryController
         );
         $transactions = $this->transactionRepository->getTransactions($criteria);
         $balance = $this->transactionRepository->getAccountBalance($accountId);
-        $summary = $this->transactionService->getSummary($transactions);
         $data = [
             'account' => $account,
             'balance' => $balance,
-            'summary' => $summary,
             'transactions' => $transactions,
         ];
         return $this->responseGenerator->render($request, 'account-summary', $data);

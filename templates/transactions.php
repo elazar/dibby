@@ -18,9 +18,6 @@
   <p>Want to <a href="<?= $this->route('add_transaction') ?>">add some</a>?</p>
 </div>
 <?php else: ?>
-<?php $this->insert('transaction-summary', ['summary' => $summary]); ?>
-
-<h2 class="center">Listing</h2>
   <?php foreach ($transactions as $transaction): ?>
     <?php $this->insert('transaction-listing', ['transaction' => $transaction]); ?>
   <?php endforeach; ?>

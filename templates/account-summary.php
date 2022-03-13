@@ -13,9 +13,6 @@
 
 <h1 class="center">Transactions</h1>
 
-<?php $this->insert('transaction-summary', ['summary' => $summary]); ?>
-
-<h2 class="center">Listing</h2>
 <?php foreach ($transactions as $transaction): ?>
 <section>
   <article>

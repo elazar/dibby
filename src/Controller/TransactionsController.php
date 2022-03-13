@@ -34,11 +34,9 @@ class TransactionsController
         }
         $criteria = TransactionCriteria::fromArray($params);
         $transactions = $this->transactionRepository->getTransactions($criteria);
-        $summary = $this->transactionService->getSummary($transactions);
 
         $data = [
             'transactions' => $transactions,
-            'summary' => $summary,
         ];
         return $this->responseGenerator->render($request, 'transactions', $data);
     }
