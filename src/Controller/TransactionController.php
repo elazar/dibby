@@ -43,8 +43,16 @@ class TransactionController
                 $transaction = $this->transactionService->fromArray($body);
                 $this->transactionService->persistTransaction($transaction);
             }
-            return $this->responseGenerator->redirect('get_transactions');
-        } elseif (isset($args['transactionId'])) {
+            $data += [
+                'action' => $body['action'],
+                'referer' => $body['referer'],
+                'debitAccount' => $transaction->getDebitAccount(),
+                'creditAccount' => $transaction->getCreditAccount(),
+            ];
+            return $this->responseGenerator->render($request, 'transactions', $data);
+        }
+
+        if (isset($args['transactionId'])) {
             $transaction = $this->transactionRepository->getTransactionById($args['transactionId']);
             $data += [
                 'id' => $transaction->getId(),
@@ -56,6 +64,7 @@ class TransactionController
             ];
         }
 
+        $data['referer'] = $request->getHeaderLine('Referer');
         return $this->responseGenerator->render($request, 'transaction', $data);
     }
 }

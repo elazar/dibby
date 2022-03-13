@@ -29,6 +29,7 @@ $title = (isset($id) ? 'Edit' : 'Add') . ' Transaction';
   <?php if (isset($id)): ?>
   <input type="hidden" name="id" value="<?= $this->e($id) ?>">
   <?php endif; ?>
+  <input type="hidden" name="referer" value="<?= $this->e($referer) ?>">
 
   <label for="amount">Amount</label>
   <input id="amount" name="amount" type="number" value="<?= $this->e($amount ?? '') ?>" step="0.01" required autofocus placeholder="e.g. 1.99">
