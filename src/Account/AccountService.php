@@ -20,7 +20,7 @@ class AccountService
 
     public function getOrCreateAccountByName(string $name): Account
     {
-        $account = $this->accountRepository->getAccountByName($name);
+        $account = $this->accountRepository->getAccountByName(trim($name));
         if (empty($account->getId())) {
             $account = $this->persistAccount($account);
         }
