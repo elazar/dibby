@@ -102,7 +102,8 @@ class DoctrineTransactionRepository implements TransactionRepository
                 $sql->setParameter('dateEnd', $dateEnd->format('Y-m-d'));
             }
             $sql->where($sql->expr()->and(...$where));
-            $sql->orderBy('date', 'desc nulls first');
+            $sql->orderBy('date is not null and date >= current_date', 'desc');
+            $sql->addOrderBy('date', 'desc nulls first');
             $result = $sql->executeQuery();
             $transactions = [];
             foreach ($result->iterateAssociative() as $row) {
