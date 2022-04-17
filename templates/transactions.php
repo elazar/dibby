@@ -18,6 +18,7 @@
   <p><a href="<?= $this->e($referer) ?>">Return to previous page</a></p>
   <p><a href="<?= $this->route('get_account_summary', ['accountId' => $debitAccount->getId()]) ?>">View <?= $this->e($debitAccount->getName()) ?></a></p>
   <p><a href="<?= $this->route('get_account_summary', ['accountId' => $creditAccount->getId()]) ?>">View <?= $this->e($creditAccount->getName()) ?></a></p>
+  <p><a href="<?= $this->route('get_accounts') ?>">List Accounts</a></p>
 </div>
 <?php elseif (count($transactions) === 0): ?>
 <div class="center">
