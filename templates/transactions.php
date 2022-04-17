@@ -10,7 +10,7 @@
   </ul>
 </nav>
 
-<h1 class="center">Transactions</h1>
+<h1 class="center">List Transactions</h1>
 
 <?php if (isset($action)): ?>
 <div class="center">

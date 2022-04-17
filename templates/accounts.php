@@ -7,7 +7,7 @@
   </ol>
 </nav>
 
-<h1 class="center">Accounts</h1>
+<h1 class="center">List Accounts</h1>
 
 <?php if (count($accounts) === 0): ?>
 <div class="center">
