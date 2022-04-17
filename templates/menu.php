@@ -20,6 +20,7 @@ $this->layout('layout');
         <h2>Accounts</h2>
         <ul>
           <li><a href="<?= $this->route('get_accounts') ?>">List Accounts</a></li>
+          <li><a href="<?= $this->route('get_accounts_reports') ?>">View Reports</a></li>
           <li><a href="<?= $this->route('get_reconcile') ?>">Reconcile</a></li>
         </ul>
       </li>

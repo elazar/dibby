@@ -28,6 +28,7 @@ use Elazar\Dibby\Controller\{
     AccountController,
     AccountSummaryController,
     AccountsController,
+    AccountsReportsController,
     ActivityController,
     HelpController,
     IndexController,
@@ -438,6 +439,11 @@ class PimpleServiceProvider implements ServiceProviderInterface
         $pimple[ReconcileController::class] = fn($c) => new ReconcileController(
             $c[ImporterReconcilerService::class],
             $c[AccountRepository::class],
+            $c[ResponseGenerator::class],
+        );
+        $pimple[AccountsReportsController::class] = fn($c) => new AccountsReportsController(
+            $c[AccountRepository::class],
+            $c[TransactionRepository::class],
             $c[ResponseGenerator::class],
         );
     }
