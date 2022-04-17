@@ -46,6 +46,7 @@ class AccountController
             $data = [
                 'id' => $account->getId(),
                 'name' => $account->getName(),
+                'creditLimit' => $account->getCreditLimit(),
             ];
         }
         return $this->responseGenerator->render($request, 'account', $data);

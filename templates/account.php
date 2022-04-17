@@ -22,6 +22,9 @@
   <label for="name">Name</label>
   <input type="text" id="name" name="name" value="<?= $this->e($name) ?>" required autofocus>
 
+  <label for="credit_limit">Credit Limit</label>
+  <input type="number" id="credit_limit" name="credit_limit" value="<?= $this->e($creditLimit) ?>" min="0" placeholder="e.g. 300">
+
   <button id="account_button" type="submit">Update Account</button>
 </form>
 

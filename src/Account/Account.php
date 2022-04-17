@@ -10,6 +10,7 @@ class Account
 
     public function __construct(
         private string $name,
+        private ?float $creditLimit = null,
         private ?string $id = null,
     ) { }
 
@@ -21,6 +22,16 @@ class Account
     public function withName(string $name): static
     {
         return $this->with('name', $name);
+    }
+
+    public function getCreditLimit(): ?float
+    {
+        return $this->creditLimit;
+    }
+
+    public function withCreditLimit(float $creditLimit): static
+    {
+        return $this->with('creditLimit', $creditLimit);
     }
 
     public function getId(): ?string
@@ -37,6 +48,10 @@ class Account
     {
         $account = new self((string) $data['name']);
 
+        if (isset($data['credit_limit'])) {
+            $account = $account->withCreditLimit((float) $data['credit_limit']);
+        }
+
         if (isset($data['id'])) {
             $account = $account->withId((string) $data['id']);
         }
@@ -49,6 +64,7 @@ class Account
         return array_filter([
             'id' => $this->id,
             'name' => $this->name,
+            'credit_limit' => $this->creditLimit,
         ]);
     }
 }
