@@ -2,5 +2,6 @@
 /.phpunit.result.cache
 /config.env
 /config.php
+/dibby.sql
 /docker/nginx/letsencrypt
 /vendor
