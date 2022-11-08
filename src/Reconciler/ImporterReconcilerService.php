@@ -29,30 +29,36 @@ class ImporterReconcilerService
     public function reconcile(string $data, string $accountId): ImporterReconcilerSummary
     {
         $importTransactions = $this->importer->import($data);
-        $importDateStart = $this->getEarliestTransactionDate($importTransactions);
-        $importDateEnd = $this->getLatestTransactionDate($importTransactions);
+        $dibbyTransactions = [];
 
-        $criteria = new TransactionCriteria(
-            dateStart: $importDateStart,
-            dateEnd: $importDateEnd,
-            debitAccountId: $accountId,
-            creditAccountId: $accountId,
-        );
-        $dibbyTransactions = $this->transactionRepository->getTransactions($criteria);
-        $dibbyTransactions = array_filter(
-          $dibbyTransactions,
-          fn(Transaction $transaction): bool => !$transaction->isPending(),
-        );
+        if (!empty($importTransactions)) {
+            $importDateStart = $this->getEarliestTransactionDate($importTransactions);
+            $importDateEnd = $this->getLatestTransactionDate($importTransactions);
 
-        $dibbyDateStart = $this->getEarliestTransactionDate($dibbyTransactions);
-        $dibbyDateEnd = $this->getLatestTransactionDate($dibbyTransactions);
-        $latestDateStart = max($importDateStart, $dibbyDateStart);
-        $earliestDateEnd = min($importDateEnd, $dibbyDateEnd);
-        $importTransactions = array_filter(
-            $importTransactions,
-            fn(ImportedTransaction $transaction): bool =>
-                $transaction->getDate() >= $latestDateStart && $transaction->getDate() <= $earliestDateEnd
-        );
+            $criteria = new TransactionCriteria(
+                dateStart: $importDateStart,
+                dateEnd: $importDateEnd,
+                debitAccountId: $accountId,
+                creditAccountId: $accountId,
+            );
+            $dibbyTransactions = $this->transactionRepository->getTransactions($criteria);
+            $dibbyTransactions = array_filter(
+              $dibbyTransactions,
+              fn(Transaction $transaction): bool => !$transaction->isPending(),
+            );
+
+            if (!empty($dibbyTransactions)) {
+                $dibbyDateStart = $this->getEarliestTransactionDate($dibbyTransactions);
+                $dibbyDateEnd = $this->getLatestTransactionDate($dibbyTransactions);
+                $latestDateStart = max($importDateStart, $dibbyDateStart);
+                $earliestDateEnd = min($importDateEnd, $dibbyDateEnd);
+                $importTransactions = array_filter(
+                    $importTransactions,
+                    fn(ImportedTransaction $transaction): bool =>
+                        $transaction->getDate() >= $latestDateStart && $transaction->getDate() <= $earliestDateEnd
+                );
+            }
+        }
 
         return $this->importerReconciler->reconcile($dibbyTransactions, $importTransactions);
     }
