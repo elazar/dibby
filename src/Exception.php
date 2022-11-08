@@ -19,6 +19,7 @@ class Exception extends \Exception
     public const CODE_USER_EXISTS                  = 11;
     public const CODE_ACCOUNT_NOT_FOUND            = 12;
     public const CODE_TRANSACTION_NOT_FOUND        = 13;
+    public const CODE_NO_COMPATIBLE_IMPORTER       = 14;
 
     public static function databaseMissingSqlitePath(): self
     {
@@ -125,6 +126,14 @@ class Exception extends \Exception
         return new self(
             'Transaction with identifier does not exist: ' . $id,
             self::CODE_TRANSACTION_NOT_FOUND,
+        );
+    }
+
+    public static function noCompatibleImporter(): self
+    {
+        return new self(
+            'No compatible importer found for specified data',
+            self::CODE_NO_COMPATIBLE_IMPORTER,
         );
     }
 }
