@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# This script is kept for posterity and should not be used.
+#
 # Usage:
 #
 # 1. Comment out this line in docker-compose.yml.
