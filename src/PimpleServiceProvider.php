@@ -50,6 +50,7 @@ use Elazar\Dibby\Importer\{
     ChaseImporter,
     CitiImporter,
     CompositeImporter,
+    Importer,
 };
 
 use Elazar\Dibby\Database\{
