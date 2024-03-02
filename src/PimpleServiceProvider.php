@@ -357,9 +357,7 @@ class PimpleServiceProvider implements ServiceProviderInterface
         $pimple[ChaseImporter::class] = fn($c) => new ChaseImporter(
             $c[DateTimeImmutable::class],
         );
-        $pimple[CitiImporter::class] = fn($c) => new CitiImporter(
-            $c[DateTimeImmutable::class],
-        );
+        $pimple[CitiImporter::class] = fn($c) => new CitiImporter;
         $pimple[CompositeImporter::class] = fn($c) => new CompositeImporter(
             $c[ChaseImporter::class],
             $c[CitiImporter::class],

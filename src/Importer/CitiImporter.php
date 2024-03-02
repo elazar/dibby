@@ -6,14 +6,6 @@ use DateTimeImmutable;
 
 class CitiImporter implements Importer
 {
-    private DateTimeImmutable $now;
-
-    public function __construct(
-        DateTimeImmutable $now,
-    ) {
-        $this->now = $now->setTime(0, 0, 0, 0);
-    }
-
     /**
      * @return ImportedTransaction[]
      */
