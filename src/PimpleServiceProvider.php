@@ -47,6 +47,7 @@ use Elazar\Dibby\Controller\{
 };
 
 use Elazar\Dibby\Importer\{
+    ChaseCreditImporter,
     ChaseImporter,
     CitiImporter,
     CompositeImporter,
@@ -354,11 +355,13 @@ class PimpleServiceProvider implements ServiceProviderInterface
         );
 
         // Reconciler
+        $pimple[ChaseCreditImporter::class] = fn($c) => new ChaseCreditImporter;
         $pimple[ChaseImporter::class] = fn($c) => new ChaseImporter(
             $c[DateTimeImmutable::class],
         );
         $pimple[CitiImporter::class] = fn($c) => new CitiImporter;
         $pimple[CompositeImporter::class] = fn($c) => new CompositeImporter(
+            $c[ChaseCreditImporter::class],
             $c[ChaseImporter::class],
             $c[CitiImporter::class],
         );
